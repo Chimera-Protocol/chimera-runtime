@@ -18,12 +18,14 @@ import {
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/lib/auth";
 
 interface NavItem {
   label: string;
   href: string;
   icon: React.ComponentType<{ className?: string }>;
   tier?: string;
+  adminOnly?: boolean;
 }
 
 const navItems: NavItem[] = [
@@ -64,6 +66,7 @@ const navItems: NavItem[] = [
     href: "/leads",
     icon: Mail,
     tier: "enterprise",
+    adminOnly: true,
   },
   {
     label: "Settings",
@@ -80,6 +83,17 @@ const navItems: NavItem[] = [
 export function Sidebar() {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
+  const { user } = useAuth();
+
+  const tierOrder: Record<string, number> = { free: 0, pro: 1, enterprise: 2 };
+  const userLevel = tierOrder[user?.tier || "free"] ?? 0;
+
+  const visibleItems = navItems.filter((item) => {
+    if (item.adminOnly) {
+      return user?.tier === "enterprise";
+    }
+    return true;
+  });
 
   return (
     <aside
@@ -102,7 +116,7 @@ export function Sidebar() {
 
       {/* Navigation */}
       <nav className="flex-1 space-y-1 px-2 py-4">
-        {navItems.map((item) => {
+        {visibleItems.map((item) => {
           const isActive =
             pathname === item.href || pathname?.startsWith(item.href + "/");
           return (
