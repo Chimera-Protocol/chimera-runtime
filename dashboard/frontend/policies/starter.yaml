@@ -1,0 +1,11 @@
+domain: StarterGuard
+
+variables:
+  risk_score: "0..100"
+  action: "{ALLOW, DENY}"
+
+rules:
+  - name: high_risk_block
+    when: "risk_score > 80"
+    then: BLOCK
+    message: "High risk score requires DENY action"
