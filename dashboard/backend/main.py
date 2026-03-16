@@ -1,0 +1,147 @@
+"""
+Chimera Compliance Dashboard — FastAPI Backend
+
+Usage:
+    cd chimera-compliance
+    uvicorn dashboard.backend.main:app --reload --port 8000
+
+The backend directly imports chimera_compliance modules — zero adapter layer.
+All audit data comes from the existing JSON file-based storage in audit_logs/.
+"""
+
+from __future__ import annotations
+
+import os
+import sys
+from contextlib import asynccontextmanager
+from pathlib import Path
+
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+from .config import DashboardConfig
+from .routers import audit, policies, analytics, compliance, auth, docs, settings, agents, leads, license
+from .models.user import create_tables
+from .models.api_key import create_api_keys_table
+from .middleware.auth import init_auth_middleware
+
+
+# Ensure the project root is on sys.path so chimera_compliance is importable
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+
+# ============================================================================
+# APP LIFESPAN
+# ============================================================================
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Initialize services on startup, cleanup on shutdown."""
+    config = DashboardConfig.from_env()
+
+    # Resolve paths relative to project root
+    audit_dir = str(PROJECT_ROOT / config.audit_dir)
+    policies_dir = str(PROJECT_ROOT / config.policies_dir)
+    config_path = str(PROJECT_ROOT / config.config_path)
+
+    # Initialize all services
+    audit.init_service(audit_dir)
+    policies.init_service(policies_dir)
+    analytics.init_service(audit_dir)
+    compliance.init_service(audit_dir, policies_dir, config_path)
+
+    # Docs service — serves repo docs/ as blog
+    docs_dir = str(PROJECT_ROOT / "docs")
+    docs.init_service(docs_dir)
+
+    # Auth system — SQLite user database
+    db_path = str(PROJECT_ROOT / config.database_url.replace("sqlite:///", ""))
+    create_tables(db_path)
+    create_api_keys_table(db_path)
+    auth.init_service(db_path, config.secret_key, config.access_token_expire_minutes)
+    init_auth_middleware(auth.get_service())
+    settings.init_service(db_path)
+    agents.init_service(audit._service)
+    leads.init_service(db_path)
+
+    print(f"  Dashboard backend started")
+    print(f"  Audit dir:    {audit_dir}")
+    print(f"  Policies dir: {policies_dir}")
+    print(f"  Auth DB:      {db_path}")
+    print(f"  API docs:     http://localhost:{config.port}/docs")
+
+    yield
+
+    print("  Dashboard backend shutting down")
+
+
+# ============================================================================
+# APP FACTORY
+# ============================================================================
+
+app = FastAPI(
+    title="Chimera Compliance Dashboard",
+    description="EU AI Act compliance monitoring dashboard for AI agents",
+    version="1.0.0",
+    lifespan=lifespan,
+    docs_url="/docs",
+    redoc_url="/redoc",
+)
+
+# CORS
+config = DashboardConfig.from_env()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=config.cors_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Mount routers
+app.include_router(auth.router, prefix="/api/v1")
+app.include_router(audit.router, prefix="/api/v1")
+app.include_router(policies.router, prefix="/api/v1")
+app.include_router(analytics.router, prefix="/api/v1")
+app.include_router(compliance.router, prefix="/api/v1")
+app.include_router(docs.router, prefix="/api/v1")
+app.include_router(settings.router, prefix="/api/v1")
+app.include_router(agents.router, prefix="/api/v1")
+app.include_router(leads.router, prefix="/api/v1")
+app.include_router(license.router)
+
+
+# ============================================================================
+# HEALTH CHECK
+# ============================================================================
+
+@app.get("/api/v1/health")
+async def health():
+    """Health check endpoint."""
+    return {
+        "status": "ok",
+        "service": "chimera-compliance-dashboard",
+        "version": "1.0.0",
+    }
+
+
+# ============================================================================
+# CLI RUNNER
+# ============================================================================
+
+def run():
+    """Entry point for `chimera-dashboard` CLI command."""
+    import uvicorn
+    config = DashboardConfig.from_env()
+    uvicorn.run(
+        "dashboard.backend.main:app",
+        host=config.host,
+        port=config.port,
+        reload=True,
+    )
+
+
+if __name__ == "__main__":
+    run()

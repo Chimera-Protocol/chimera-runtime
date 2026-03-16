@@ -1,0 +1,61 @@
+CONFIG {
+  ENFORCEMENT_MODE: BLOCK
+  CHECK_LOGICAL_CONSISTENCY: TRUE
+}
+
+DOMAIN GovernanceGuard {
+  VARIABLES {
+    amount: 0..1000000
+    role: {"ANALYST", "MANAGER", "DIRECTOR", "VP", "CEO"}
+    channel: {"DIGITAL", "TV", "PRINT", "RADIO", "ALL"}
+    is_weekend: {"YES", "NO"}
+    urgency: {"LOW", "MEDIUM", "HIGH", "CRITICAL"}
+    department: {"MARKETING", "ENGINEERING", "FINANCE", "OPERATIONS", "HR"}
+  }
+
+  // --- Authority Limits ---
+  // Analysts cannot approve any spend
+  STATE_CONSTRAINT analyst_no_spend {
+    WHEN role == "ANALYST"
+    THEN amount <= 0
+  }
+
+  // Managers capped at $250,000
+  STATE_CONSTRAINT manager_approval_limit {
+    WHEN role == "MANAGER"
+    THEN amount <= 250000
+  }
+
+  // Directors capped at $500,000
+  STATE_CONSTRAINT director_approval_limit {
+    WHEN role == "DIRECTOR"
+    THEN amount <= 500000
+  }
+
+  // VP capped at $750,000
+  STATE_CONSTRAINT vp_approval_limit {
+    WHEN role == "VP"
+    THEN amount <= 750000
+  }
+
+  // --- Channel Constraints ---
+  // Single channel budget cap: $300,000
+  STATE_CONSTRAINT single_channel_cap {
+    WHEN channel != "ALL"
+    THEN amount <= 300000
+  }
+
+  // --- Temporal Constraints ---
+  // No budget changes on weekends unless critical
+  STATE_CONSTRAINT weekend_freeze {
+    WHEN is_weekend == "YES"
+    THEN urgency == "CRITICAL"
+  }
+
+  // --- Safety Rails ---
+  // Absolute ceiling: no single decision exceeds $1,000,000
+  STATE_CONSTRAINT absolute_ceiling {
+    ALWAYS True
+    THEN amount <= 1000000
+  }
+}

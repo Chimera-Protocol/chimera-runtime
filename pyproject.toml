@@ -1,0 +1,136 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "chimera-compliance"
+version = "1.0.0"
+description = "EU AI Act compliant AI agent compliance layer — plug into any agent framework, enforce deterministic policy guards, audit every decision."
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.10"
+authors = [
+    { name = "Aytug Akarlar", email = "akarlaraytu@gmail.com" },
+]
+keywords = [
+    "ai-agent",
+    "ai-safety",
+    "eu-ai-act",
+    "formal-verification",
+    "compliance",
+    "audit",
+    "csl",
+    "z3",
+    "neuro-symbolic",
+    "policy-engine",
+    "langchain",
+    "langgraph",
+    "llamaindex",
+    "crewai",
+    "autogen",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Financial and Insurance Industry",
+    "Intended Audience :: Legal Industry",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Security",
+    "Topic :: Software Development :: Libraries :: Application Frameworks",
+    "Typing :: Typed",
+]
+dependencies = [
+    "pyyaml>=6.0",
+    "rich>=13.0.0",
+    "click>=8.0",
+    "jinja2>=3.0",
+]
+
+[project.optional-dependencies]
+csl = ["csl-core>=0.3.0"]
+openai = ["openai>=1.0"]
+anthropic = ["anthropic>=0.40"]
+google = ["google-generativeai>=0.5"]
+ollama = ["ollama>=0.3"]
+langchain = ["langchain-core>=0.3.0"]
+langgraph = ["langgraph>=0.2.0"]
+llamaindex = ["llama-index-core>=0.11.0"]
+crewai = ["crewai>=0.80.0"]
+autogen = ["autogen-agentchat>=0.4.0"]
+pro = ["PyJWT[crypto]>=2.8.0"]
+all = [
+    "chimera-compliance[csl,openai,anthropic,google,ollama,langchain,langgraph,llamaindex,crewai,autogen,pro]",
+]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "ruff>=0.4",
+    "mypy>=1.0",
+]
+
+[project.scripts]
+chimera-compliance = "chimera_compliance.cli.main:cli"
+
+[project.urls]
+Homepage = "https://compliance.chimera-protocol.com"
+Documentation = "https://compliance.chimera-protocol.com/docs"
+Dashboard = "https://compliance.chimera-protocol.com"
+
+[tool.hatch.build.targets.wheel]
+packages = ["chimera_compliance"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"policies" = "chimera_compliance/_bundled_policies"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "chimera_compliance/",
+    "policies/",
+    "tests/",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md",
+    "pyproject.toml",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+markers = [
+    "integration: Full end-to-end integration tests",
+    "slow: Tests that take more than 5 seconds",
+]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM"]
+ignore = ["E501"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["chimera_compliance"]
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+
+[tool.coverage.run]
+source = ["chimera_compliance"]
+omit = ["chimera_compliance/cli/*"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+fail_under = 80

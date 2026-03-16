@@ -1,0 +1,18 @@
+CONFIG {
+  ENFORCEMENT_MODE: BLOCK
+}
+
+DOMAIN PaymentGuard {
+  VARIABLES {
+    // Define your variables here
+    // amount: 0..1000000
+    // role: {"ADMIN", "USER", "MANAGER"}
+    // action: {"APPROVE", "DENY", "ESCALATE"}
+  }
+
+  // Add your constraints here
+  // STATE_CONSTRAINT example_constraint {
+  //   WHEN amount > 10000
+  //   THEN role == "ADMIN"
+  // }
+}

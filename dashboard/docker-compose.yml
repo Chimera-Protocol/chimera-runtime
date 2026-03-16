@@ -1,0 +1,36 @@
+services:
+  backend:
+    build:
+      context: ..
+      dockerfile: dashboard/Dockerfile.backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ../audit_logs:/app/audit_logs
+      - ../policies:/app/policies
+      - ../.chimera:/app/.chimera
+      - chimera_db:/app/data
+    environment:
+      - CHIMERA_AUDIT_DIR=./audit_logs
+      - CHIMERA_POLICIES_DIR=./policies
+      - CHIMERA_CONFIG_PATH=./.chimera/config.yaml
+      - CHIMERA_DASHBOARD_PORT=8000
+      - CHIMERA_SECRET_KEY=${CHIMERA_SECRET_KEY:-chimera-dashboard-change-me}
+      - CHIMERA_CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
+      - CHIMERA_DATABASE_URL=sqlite:///./data/chimera_dashboard.db
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  chimera_db:

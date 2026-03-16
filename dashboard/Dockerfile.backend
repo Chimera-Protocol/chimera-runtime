@@ -1,0 +1,18 @@
+FROM python:3.12-slim
+
+WORKDIR /app
+
+# Install chimera-compliance + dashboard deps
+COPY pyproject.toml README.md ./
+COPY chimera_compliance/ chimera_compliance/
+COPY policies/ policies/
+COPY dashboard/backend/ dashboard/backend/
+COPY dashboard/backend/requirements.txt dashboard/backend/requirements.txt
+COPY docs/ docs/
+
+RUN pip install --no-cache-dir -e ".[csl]" && \
+    pip install --no-cache-dir -r dashboard/backend/requirements.txt
+
+EXPOSE 8000
+
+CMD ["python3", "-m", "uvicorn", "dashboard.backend.main:app", "--host", "0.0.0.0", "--port", "8000"]

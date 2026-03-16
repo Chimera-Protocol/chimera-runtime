@@ -1,0 +1,45 @@
+domain: GovernanceGuard
+
+variables:
+  amount: "0..1000000"
+  role: "{ANALYST, MANAGER, DIRECTOR, VP, CEO}"
+  channel: "{DIGITAL, TV, PRINT, RADIO, ALL}"
+  is_weekend: "{YES, NO}"
+  urgency: "{LOW, MEDIUM, HIGH, CRITICAL}"
+  department: "{MARKETING, ENGINEERING, FINANCE, OPERATIONS, HR}"
+
+rules:
+  - name: analyst_no_spend
+    when: "role == 'ANALYST' and amount > 0"
+    then: BLOCK
+    message: "Analysts cannot approve any spend"
+
+  - name: manager_approval_limit
+    when: "role == 'MANAGER' and amount > 250000"
+    then: BLOCK
+    message: "Managers cannot approve more than $250,000"
+
+  - name: director_approval_limit
+    when: "role == 'DIRECTOR' and amount > 500000"
+    then: BLOCK
+    message: "Directors cannot approve more than $500,000"
+
+  - name: vp_approval_limit
+    when: "role == 'VP' and amount > 750000"
+    then: BLOCK
+    message: "VPs cannot approve more than $750,000"
+
+  - name: single_channel_cap
+    when: "channel != 'ALL' and amount > 300000"
+    then: BLOCK
+    message: "Single channel budget capped at $300,000"
+
+  - name: weekend_freeze
+    when: "is_weekend == 'YES' and urgency != 'CRITICAL'"
+    then: BLOCK
+    message: "No budget changes on weekends unless critical"
+
+  - name: absolute_ceiling
+    when: "amount > 1000000"
+    then: BLOCK
+    message: "Absolute ceiling: no single decision exceeds $1,000,000"

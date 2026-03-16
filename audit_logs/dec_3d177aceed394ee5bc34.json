@@ -1,0 +1,136 @@
+{
+  "schema_version": "1.0.0",
+  "decision_id": "dec_3d177aceed394ee5bc34",
+  "timestamp": "2026-03-08T11:27:54.766Z",
+  "agent": {
+    "name": "chimera-compliance-guard",
+    "version": "0.1.0",
+    "csl_core_version": "0.3.0",
+    "model": "gpt-4o-demo",
+    "model_provider": "demo",
+    "temperature": 0.7
+  },
+  "input": {
+    "raw_request": "BLOCKED",
+    "structured_params": {},
+    "context": {}
+  },
+  "reasoning": {
+    "total_candidates": 2,
+    "total_attempts": 1,
+    "attempts": [
+      {
+        "attempt_number": 1,
+        "candidates": [
+          {
+            "candidate_id": "cand_001",
+            "strategy": "SWIFT international wire transfer",
+            "llm_reasoning": "CFO-authorized cross-border transfer to subsidiary",
+            "llm_confidence": 0.93,
+            "parameters": {
+              "amount": 620000,
+              "role": "CFO",
+              "transaction_type": "TRANSFER",
+              "is_weekend": "NO",
+              "risk_level": "HIGH",
+              "destination": "INTERNATIONAL"
+            },
+            "policy_evaluation": {
+              "policy_file": "/Users/aytugakarlar/Desktop/chimera-compliance/policies/governance.csl",
+              "policy_hash": "sha256:3a8dc2bdcec45c482094ba6dea5c57d72d3a11cff0990a6b7234364ccbb43a71",
+              "result": "BLOCKED",
+              "duration_ms": 0.025,
+              "violations": [
+                {
+                  "constraint": "single_channel_cap",
+                  "rule": "Violation 'single_channel_cap': amount=620000 must be <= 300000.",
+                  "trigger_values": {
+                    "amount": 620000,
+                    "role": "CFO",
+                    "transaction_type": "TRANSFER",
+                    "is_weekend": "NO",
+                    "risk_level": "HIGH",
+                    "destination": "INTERNATIONAL"
+                  },
+                  "explanation": "Violation 'single_channel_cap': amount=620000 must be <= 300000."
+                }
+              ]
+            }
+          },
+          {
+            "candidate_id": "cand_002",
+            "strategy": "Multi-currency treasury transfer",
+            "llm_reasoning": "Based on risk assessment and policy analysis.",
+            "llm_confidence": 0.87,
+            "parameters": {
+              "amount": 620000,
+              "role": "CFO",
+              "transaction_type": "TRANSFER",
+              "is_weekend": "NO",
+              "risk_level": "MEDIUM",
+              "destination": "INTERNATIONAL"
+            },
+            "policy_evaluation": {
+              "policy_file": "/Users/aytugakarlar/Desktop/chimera-compliance/policies/governance.csl",
+              "policy_hash": "sha256:3a8dc2bdcec45c482094ba6dea5c57d72d3a11cff0990a6b7234364ccbb43a71",
+              "result": "BLOCKED",
+              "duration_ms": 0.011,
+              "violations": [
+                {
+                  "constraint": "single_channel_cap",
+                  "rule": "Violation 'single_channel_cap': amount=620000 must be <= 300000.",
+                  "trigger_values": {
+                    "amount": 620000,
+                    "role": "CFO",
+                    "transaction_type": "TRANSFER",
+                    "is_weekend": "NO",
+                    "risk_level": "MEDIUM",
+                    "destination": "INTERNATIONAL"
+                  },
+                  "explanation": "Violation 'single_channel_cap': amount=620000 must be <= 300000."
+                }
+              ]
+            }
+          }
+        ],
+        "outcome": "ALL_BLOCKED",
+        "note": "0/2 candidates passed policy"
+      }
+    ],
+    "selected_candidate": null,
+    "selection_reasoning": "No policy-compliant candidates found"
+  },
+  "decision": {
+    "action_taken": "BLOCKED",
+    "result": "BLOCKED",
+    "final_parameters": {},
+    "policy_file": "/Users/aytugakarlar/Desktop/chimera-compliance/policies/governance.csl",
+    "policy_hash": "sha256:3a8dc2bdcec45c482094ba6dea5c57d72d3a11cff0990a6b7234364ccbb43a71"
+  },
+  "compliance": {
+    "eu_ai_act": {
+      "article_12_record_keeping": true,
+      "article_13_transparency": true,
+      "article_14_human_oversight": true,
+      "article_15_adversarial_resilience": true,
+      "article_19_auto_logs": true,
+      "article_86_right_to_explanation": true
+    },
+    "formal_verification": {
+      "policy_verified": true,
+      "verification_engine": "Z3",
+      "verification_result": "SAT"
+    },
+    "human_oversight": {
+      "override_available": true,
+      "stop_mechanism": true,
+      "policy_human_editable": true
+    }
+  },
+  "performance": {
+    "total_duration_ms": 0.2,
+    "llm_duration_ms": 0.049,
+    "policy_evaluation_ms": 0.052,
+    "audit_generation_ms": 0.011
+  }
+}

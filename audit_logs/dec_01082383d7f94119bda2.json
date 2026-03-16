@@ -1,0 +1,101 @@
+{
+  "schema_version": "1.0.0",
+  "decision_id": "dec_01082383d7f94119bda2",
+  "timestamp": "2026-03-08T11:27:55.019Z",
+  "agent": {
+    "name": "chimera-compliance-guard",
+    "version": "0.1.0",
+    "csl_core_version": "0.3.0",
+    "model": "gpt-4o-demo",
+    "model_provider": "demo",
+    "temperature": 0.7
+  },
+  "input": {
+    "raw_request": "Request leading to: International tax optimization transfer",
+    "structured_params": {
+      "amount": 150000,
+      "role": "MANAGER",
+      "transaction_type": "TRANSFER",
+      "is_weekend": "NO",
+      "risk_level": "HIGH",
+      "destination": "INTERNATIONAL"
+    },
+    "context": {}
+  },
+  "reasoning": {
+    "total_candidates": 1,
+    "total_attempts": 1,
+    "attempts": [
+      {
+        "attempt_number": 1,
+        "candidates": [
+          {
+            "candidate_id": "cand_001",
+            "strategy": "International tax optimization transfer",
+            "llm_reasoning": "Cross-border transfer to optimize tax structure",
+            "llm_confidence": 0.65,
+            "parameters": {
+              "amount": 150000,
+              "role": "MANAGER",
+              "transaction_type": "TRANSFER",
+              "is_weekend": "NO",
+              "risk_level": "HIGH",
+              "destination": "INTERNATIONAL"
+            },
+            "policy_evaluation": {
+              "policy_file": "/Users/aytugakarlar/Desktop/chimera-compliance/policies/governance.csl",
+              "policy_hash": "sha256:3a8dc2bdcec45c482094ba6dea5c57d72d3a11cff0990a6b7234364ccbb43a71",
+              "result": "ALLOWED",
+              "duration_ms": 0.018,
+              "violations": []
+            }
+          }
+        ],
+        "outcome": "ALL_PASSED",
+        "note": "1/1 candidates passed policy"
+      }
+    ],
+    "selected_candidate": "cand_001",
+    "selection_reasoning": "Highest confidence (0.65) among 1 policy-compliant candidates"
+  },
+  "decision": {
+    "action_taken": "International tax optimization transfer",
+    "result": "ALLOWED",
+    "final_parameters": {
+      "amount": 150000,
+      "role": "MANAGER",
+      "transaction_type": "TRANSFER",
+      "is_weekend": "NO",
+      "risk_level": "HIGH",
+      "destination": "INTERNATIONAL"
+    },
+    "policy_file": "/Users/aytugakarlar/Desktop/chimera-compliance/policies/governance.csl",
+    "policy_hash": "sha256:3a8dc2bdcec45c482094ba6dea5c57d72d3a11cff0990a6b7234364ccbb43a71"
+  },
+  "compliance": {
+    "eu_ai_act": {
+      "article_12_record_keeping": true,
+      "article_13_transparency": true,
+      "article_14_human_oversight": true,
+      "article_15_adversarial_resilience": true,
+      "article_19_auto_logs": true,
+      "article_86_right_to_explanation": true
+    },
+    "formal_verification": {
+      "policy_verified": true,
+      "verification_engine": "Z3",
+      "verification_result": "SAT"
+    },
+    "human_oversight": {
+      "override_available": true,
+      "stop_mechanism": true,
+      "policy_human_editable": true
+    }
+  },
+  "performance": {
+    "total_duration_ms": 0.132,
+    "llm_duration_ms": 0.038,
+    "policy_evaluation_ms": 0.024,
+    "audit_generation_ms": 0.013
+  }
+}

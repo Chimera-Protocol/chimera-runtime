@@ -1,0 +1,89 @@
+{
+  "schema_version": "1.0.0",
+  "decision_id": "dec_95abb0ca56ea4f7cb365",
+  "timestamp": "2026-02-26T07:45:22.918Z",
+  "agent": {
+    "name": "chimera-agent",
+    "version": "0.1.0",
+    "csl_core_version": "0.3.0",
+    "model": "gpt-4o",
+    "model_provider": "openai",
+    "temperature": 0.5
+  },
+  "input": {
+    "raw_request": "Request leading to: Conservative approach",
+    "structured_params": {
+      "amount": 1000,
+      "destination": "INTERNAL"
+    },
+    "context": {}
+  },
+  "reasoning": {
+    "total_candidates": 1,
+    "total_attempts": 1,
+    "attempts": [
+      {
+        "attempt_number": 1,
+        "candidates": [
+          {
+            "candidate_id": "cand_001",
+            "strategy": "Conservative approach",
+            "llm_reasoning": "To minimize risk and ensure compliance, a conservative strategy involves a low transfer amount to an internal destination, which is generally considered safer and more controllable.",
+            "llm_confidence": 0.9,
+            "parameters": {
+              "amount": 1000,
+              "destination": "INTERNAL"
+            },
+            "policy_evaluation": {
+              "policy_file": "/Users/aytugakarlar/Desktop/chimera-agent/policies/starter.csl",
+              "policy_hash": "sha256:52eb79ee386723fa3e915788f25336a1cbb1b1c9adf5db245b8a7a39a54348c4",
+              "result": "ALLOWED",
+              "duration_ms": 0.154,
+              "violations": []
+            }
+          }
+        ],
+        "outcome": "ALL_PASSED",
+        "note": "1/1 candidates passed policy"
+      }
+    ],
+    "selected_candidate": "cand_001",
+    "selection_reasoning": "Highest confidence (0.90) among 1 policy-compliant candidates"
+  },
+  "decision": {
+    "action_taken": "Conservative approach",
+    "result": "ALLOWED",
+    "final_parameters": {
+      "amount": 1000,
+      "destination": "INTERNAL"
+    },
+    "policy_file": "/Users/aytugakarlar/Desktop/chimera-agent/policies/starter.csl",
+    "policy_hash": "sha256:52eb79ee386723fa3e915788f25336a1cbb1b1c9adf5db245b8a7a39a54348c4"
+  },
+  "compliance": {
+    "eu_ai_act": {
+      "article_12_record_keeping": true,
+      "article_13_transparency": true,
+      "article_14_human_oversight": true,
+      "article_15_adversarial_resilience": true,
+      "article_19_auto_logs": true,
+      "article_86_right_to_explanation": true
+    },
+    "formal_verification": {
+      "policy_verified": true,
+      "verification_engine": "Z3",
+      "verification_result": "SAT"
+    },
+    "human_oversight": {
+      "override_available": true,
+      "stop_mechanism": true,
+      "policy_human_editable": true
+    }
+  },
+  "performance": {
+    "total_duration_ms": 3619.272,
+    "llm_duration_ms": 3614.889,
+    "policy_evaluation_ms": 0.236,
+    "audit_generation_ms": 0.068
+  }
+}

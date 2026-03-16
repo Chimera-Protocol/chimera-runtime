@@ -1,0 +1,123 @@
+{
+  "schema_version": "1.0.0",
+  "decision_id": "dec_259bb907c4214e8fa608",
+  "timestamp": "2026-02-26T07:41:58.116Z",
+  "agent": {
+    "name": "chimera-agent",
+    "version": "0.1.0",
+    "csl_core_version": "0.3.0",
+    "model": "gpt-4o",
+    "model_provider": "openai",
+    "temperature": 0.5
+  },
+  "input": {
+    "raw_request": "Request leading to: Minimal Internal Transfer",
+    "structured_params": {
+      "amount": 100,
+      "destination": "INTERNAL"
+    },
+    "context": {}
+  },
+  "reasoning": {
+    "total_candidates": 2,
+    "total_attempts": 2,
+    "attempts": [
+      {
+        "attempt_number": 1,
+        "candidates": [
+          {
+            "candidate_id": "cand_001",
+            "strategy": "Conservative approach",
+            "llm_reasoning": "To ensure compliance with policy, a conservative amount is chosen with an external destination, minimizing risk.",
+            "llm_confidence": 0.9,
+            "parameters": {
+              "amount": 1000,
+              "destination": "EXTERNAL"
+            },
+            "policy_evaluation": {
+              "policy_file": "/Users/aytugakarlar/Desktop/chimera-agent/policies/starter.csl",
+              "policy_hash": "sha256:52eb79ee386723fa3e915788f25336a1cbb1b1c9adf5db245b8a7a39a54348c4",
+              "result": "BLOCKED",
+              "duration_ms": 0.273,
+              "violations": [
+                {
+                  "constraint": "limit_large_transfers",
+                  "rule": "Violation 'limit_large_transfers': destination='EXTERNAL' must be MUST BE 'INTERNAL'.",
+                  "trigger_values": {
+                    "amount": 1000,
+                    "destination": "EXTERNAL"
+                  },
+                  "explanation": "Violation 'limit_large_transfers': destination='EXTERNAL' must be MUST BE 'INTERNAL'."
+                }
+              ]
+            }
+          }
+        ],
+        "outcome": "ALL_BLOCKED",
+        "note": "0/1 candidates passed policy"
+      },
+      {
+        "attempt_number": 2,
+        "candidates": [
+          {
+            "candidate_id": "cand_001",
+            "strategy": "Minimal Internal Transfer",
+            "llm_reasoning": "A very conservative strategy with a minimal amount ensures compliance with internal transfer policies.",
+            "llm_confidence": 0.9,
+            "parameters": {
+              "amount": 100,
+              "destination": "INTERNAL"
+            },
+            "policy_evaluation": {
+              "policy_file": "/Users/aytugakarlar/Desktop/chimera-agent/policies/starter.csl",
+              "policy_hash": "sha256:52eb79ee386723fa3e915788f25336a1cbb1b1c9adf5db245b8a7a39a54348c4",
+              "result": "ALLOWED",
+              "duration_ms": 0.051,
+              "violations": []
+            }
+          }
+        ],
+        "outcome": "ALL_PASSED",
+        "note": "1/1 candidates passed policy"
+      }
+    ],
+    "selected_candidate": "cand_001",
+    "selection_reasoning": "Highest confidence (0.90) among 1 policy-compliant candidates"
+  },
+  "decision": {
+    "action_taken": "Minimal Internal Transfer",
+    "result": "ALLOWED",
+    "final_parameters": {
+      "amount": 100,
+      "destination": "INTERNAL"
+    },
+    "policy_file": "/Users/aytugakarlar/Desktop/chimera-agent/policies/starter.csl",
+    "policy_hash": "sha256:52eb79ee386723fa3e915788f25336a1cbb1b1c9adf5db245b8a7a39a54348c4"
+  },
+  "compliance": {
+    "eu_ai_act": {
+      "article_12_record_keeping": true,
+      "article_13_transparency": true,
+      "article_14_human_oversight": true,
+      "article_15_adversarial_resilience": true,
+      "article_19_auto_logs": true,
+      "article_86_right_to_explanation": true
+    },
+    "formal_verification": {
+      "policy_verified": true,
+      "verification_engine": "Z3",
+      "verification_result": "SAT"
+    },
+    "human_oversight": {
+      "override_available": true,
+      "stop_mechanism": true,
+      "policy_human_editable": true
+    }
+  },
+  "performance": {
+    "total_duration_ms": 5297.748,
+    "llm_duration_ms": 5288.23,
+    "policy_evaluation_ms": 0.458,
+    "audit_generation_ms": 0.146
+  }
+}

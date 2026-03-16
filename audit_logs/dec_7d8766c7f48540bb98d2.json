@@ -1,0 +1,143 @@
+{
+  "schema_version": "1.0.0",
+  "decision_id": "dec_7d8766c7f48540bb98d2",
+  "timestamp": "2026-03-08T11:27:54.636Z",
+  "agent": {
+    "name": "chimera-compliance-guard",
+    "version": "0.1.0",
+    "csl_core_version": "0.3.0",
+    "model": "gpt-4o-demo",
+    "model_provider": "demo",
+    "temperature": 0.7
+  },
+  "input": {
+    "raw_request": "Request leading to: Standard payroll transfer via ACH",
+    "structured_params": {
+      "amount": 45000,
+      "role": "MANAGER",
+      "transaction_type": "TRANSFER",
+      "is_weekend": "NO",
+      "risk_level": "LOW",
+      "destination": "DOMESTIC"
+    },
+    "context": {}
+  },
+  "reasoning": {
+    "total_candidates": 3,
+    "total_attempts": 1,
+    "attempts": [
+      {
+        "attempt_number": 1,
+        "candidates": [
+          {
+            "candidate_id": "cand_001",
+            "strategy": "Standard payroll transfer via ACH",
+            "llm_reasoning": "Regular quarterly bonus disbursement within manager limits",
+            "llm_confidence": 0.92,
+            "parameters": {
+              "amount": 45000,
+              "role": "MANAGER",
+              "transaction_type": "TRANSFER",
+              "is_weekend": "NO",
+              "risk_level": "LOW",
+              "destination": "DOMESTIC"
+            },
+            "policy_evaluation": {
+              "policy_file": "/Users/aytugakarlar/Desktop/chimera-compliance/policies/governance.csl",
+              "policy_hash": "sha256:3a8dc2bdcec45c482094ba6dea5c57d72d3a11cff0990a6b7234364ccbb43a71",
+              "result": "ALLOWED",
+              "duration_ms": 0.028,
+              "violations": []
+            }
+          },
+          {
+            "candidate_id": "cand_002",
+            "strategy": "Batch payroll with compliance check",
+            "llm_reasoning": "Based on risk assessment and policy analysis.",
+            "llm_confidence": 0.88,
+            "parameters": {
+              "amount": 45000,
+              "role": "MANAGER",
+              "transaction_type": "TRANSFER",
+              "is_weekend": "NO",
+              "risk_level": "LOW",
+              "destination": "DOMESTIC"
+            },
+            "policy_evaluation": {
+              "policy_file": "/Users/aytugakarlar/Desktop/chimera-compliance/policies/governance.csl",
+              "policy_hash": "sha256:3a8dc2bdcec45c482094ba6dea5c57d72d3a11cff0990a6b7234364ccbb43a71",
+              "result": "ALLOWED",
+              "duration_ms": 0.013,
+              "violations": []
+            }
+          },
+          {
+            "candidate_id": "cand_003",
+            "strategy": "Split into departmental sub-transfers",
+            "llm_reasoning": "Based on risk assessment and policy analysis.",
+            "llm_confidence": 0.75,
+            "parameters": {
+              "amount": 45000,
+              "role": "MANAGER",
+              "transaction_type": "TRANSFER",
+              "is_weekend": "NO",
+              "risk_level": "LOW",
+              "destination": "DOMESTIC"
+            },
+            "policy_evaluation": {
+              "policy_file": "/Users/aytugakarlar/Desktop/chimera-compliance/policies/governance.csl",
+              "policy_hash": "sha256:3a8dc2bdcec45c482094ba6dea5c57d72d3a11cff0990a6b7234364ccbb43a71",
+              "result": "ALLOWED",
+              "duration_ms": 0.009,
+              "violations": []
+            }
+          }
+        ],
+        "outcome": "ALL_PASSED",
+        "note": "3/3 candidates passed policy"
+      }
+    ],
+    "selected_candidate": "cand_001",
+    "selection_reasoning": "Highest confidence (0.92) among 3 policy-compliant candidates"
+  },
+  "decision": {
+    "action_taken": "Standard payroll transfer via ACH",
+    "result": "ALLOWED",
+    "final_parameters": {
+      "amount": 45000,
+      "role": "MANAGER",
+      "transaction_type": "TRANSFER",
+      "is_weekend": "NO",
+      "risk_level": "LOW",
+      "destination": "DOMESTIC"
+    },
+    "policy_file": "/Users/aytugakarlar/Desktop/chimera-compliance/policies/governance.csl",
+    "policy_hash": "sha256:3a8dc2bdcec45c482094ba6dea5c57d72d3a11cff0990a6b7234364ccbb43a71"
+  },
+  "compliance": {
+    "eu_ai_act": {
+      "article_12_record_keeping": true,
+      "article_13_transparency": true,
+      "article_14_human_oversight": true,
+      "article_15_adversarial_resilience": true,
+      "article_19_auto_logs": true,
+      "article_86_right_to_explanation": true
+    },
+    "formal_verification": {
+      "policy_verified": true,
+      "verification_engine": "Z3",
+      "verification_result": "SAT"
+    },
+    "human_oversight": {
+      "override_available": true,
+      "stop_mechanism": true,
+      "policy_human_editable": true
+    }
+  },
+  "performance": {
+    "total_duration_ms": 0.226,
+    "llm_duration_ms": 0.067,
+    "policy_evaluation_ms": 0.067,
+    "audit_generation_ms": 0.019
+  }
+}

@@ -1,0 +1,136 @@
+{
+  "schema_version": "1.0.0",
+  "decision_id": "dec_1c2c83dbaf05429cab95",
+  "timestamp": "2026-03-08T11:27:54.894Z",
+  "agent": {
+    "name": "chimera-compliance-guard",
+    "version": "0.1.0",
+    "csl_core_version": "0.3.0",
+    "model": "gpt-4o-demo",
+    "model_provider": "demo",
+    "temperature": 0.7
+  },
+  "input": {
+    "raw_request": "BLOCKED",
+    "structured_params": {},
+    "context": {}
+  },
+  "reasoning": {
+    "total_candidates": 2,
+    "total_attempts": 1,
+    "attempts": [
+      {
+        "attempt_number": 1,
+        "candidates": [
+          {
+            "candidate_id": "cand_001",
+            "strategy": "Direct expense reimbursement transfer",
+            "llm_reasoning": "Analyst attempting transfer operation",
+            "llm_confidence": 0.72,
+            "parameters": {
+              "amount": 5000,
+              "role": "ANALYST",
+              "transaction_type": "TRANSFER",
+              "is_weekend": "NO",
+              "risk_level": "LOW",
+              "destination": "DOMESTIC"
+            },
+            "policy_evaluation": {
+              "policy_file": "/Users/aytugakarlar/Desktop/chimera-compliance/policies/governance.csl",
+              "policy_hash": "sha256:3a8dc2bdcec45c482094ba6dea5c57d72d3a11cff0990a6b7234364ccbb43a71",
+              "result": "BLOCKED",
+              "duration_ms": 0.022,
+              "violations": [
+                {
+                  "constraint": "analyst_no_spend",
+                  "rule": "Violation 'analyst_no_spend': amount=5000 must be <= 0.",
+                  "trigger_values": {
+                    "amount": 5000,
+                    "role": "ANALYST",
+                    "transaction_type": "TRANSFER",
+                    "is_weekend": "NO",
+                    "risk_level": "LOW",
+                    "destination": "DOMESTIC"
+                  },
+                  "explanation": "Violation 'analyst_no_spend': amount=5000 must be <= 0."
+                }
+              ]
+            }
+          },
+          {
+            "candidate_id": "cand_002",
+            "strategy": "Petty cash disbursement",
+            "llm_reasoning": "Based on risk assessment and policy analysis.",
+            "llm_confidence": 0.68,
+            "parameters": {
+              "amount": 5000,
+              "role": "ANALYST",
+              "transaction_type": "TRANSFER",
+              "is_weekend": "NO",
+              "risk_level": "LOW",
+              "destination": "DOMESTIC"
+            },
+            "policy_evaluation": {
+              "policy_file": "/Users/aytugakarlar/Desktop/chimera-compliance/policies/governance.csl",
+              "policy_hash": "sha256:3a8dc2bdcec45c482094ba6dea5c57d72d3a11cff0990a6b7234364ccbb43a71",
+              "result": "BLOCKED",
+              "duration_ms": 0.011,
+              "violations": [
+                {
+                  "constraint": "analyst_no_spend",
+                  "rule": "Violation 'analyst_no_spend': amount=5000 must be <= 0.",
+                  "trigger_values": {
+                    "amount": 5000,
+                    "role": "ANALYST",
+                    "transaction_type": "TRANSFER",
+                    "is_weekend": "NO",
+                    "risk_level": "LOW",
+                    "destination": "DOMESTIC"
+                  },
+                  "explanation": "Violation 'analyst_no_spend': amount=5000 must be <= 0."
+                }
+              ]
+            }
+          }
+        ],
+        "outcome": "ALL_BLOCKED",
+        "note": "0/2 candidates passed policy"
+      }
+    ],
+    "selected_candidate": null,
+    "selection_reasoning": "No policy-compliant candidates found"
+  },
+  "decision": {
+    "action_taken": "BLOCKED",
+    "result": "BLOCKED",
+    "final_parameters": {},
+    "policy_file": "/Users/aytugakarlar/Desktop/chimera-compliance/policies/governance.csl",
+    "policy_hash": "sha256:3a8dc2bdcec45c482094ba6dea5c57d72d3a11cff0990a6b7234364ccbb43a71"
+  },
+  "compliance": {
+    "eu_ai_act": {
+      "article_12_record_keeping": true,
+      "article_13_transparency": true,
+      "article_14_human_oversight": true,
+      "article_15_adversarial_resilience": true,
+      "article_19_auto_logs": true,
+      "article_86_right_to_explanation": true
+    },
+    "formal_verification": {
+      "policy_verified": true,
+      "verification_engine": "Z3",
+      "verification_result": "SAT"
+    },
+    "human_oversight": {
+      "override_available": true,
+      "stop_mechanism": true,
+      "policy_human_editable": true
+    }
+  },
+  "performance": {
+    "total_duration_ms": 0.174,
+    "llm_duration_ms": 0.047,
+    "policy_evaluation_ms": 0.044,
+    "audit_generation_ms": 0.01
+  }
+}
