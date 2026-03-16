@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/Chimera-Protocol/chimera-compliance/main/.github/banner.png" alt="chimera-compliance" width="600">
+  <img src=".github/banner.png" alt="chimera-compliance" width="600">
 </p>
 
 <h1 align="center">chimera-compliance</h1>
@@ -12,7 +12,7 @@
 <p align="center">
   <a href="https://pypi.org/project/chimera-compliance/"><img src="https://img.shields.io/pypi/v/chimera-compliance?color=blue&logo=pypi" alt="PyPI"></a>
   <a href="https://pypi.org/project/chimera-compliance/"><img src="https://img.shields.io/pypi/pyversions/chimera-compliance?logo=python" alt="Python"></a>
-  <a href="https://github.com/Chimera-Protocol/chimera-compliance/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-green" alt="License"></a>
+  <a href="https://github.com/akarlaraytu/chimera-compliance/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-green" alt="License"></a>
   <a href="https://compliance.chimera-protocol.com"><img src="https://img.shields.io/badge/dashboard-live-6366f1" alt="Dashboard"></a>
   <a href="https://pypi.org/project/csl-core/"><img src="https://img.shields.io/badge/powered%20by-CSL--Core-cyan" alt="CSL-Core"></a>
 </p>
@@ -22,7 +22,6 @@
   <a href="#dashboard">Dashboard</a> &bull;
   <a href="#architecture">Architecture</a> &bull;
   <a href="#agent-framework-integrations">Integrations</a> &bull;
-  <a href="#pricing">Pricing</a> &bull;
   <a href="#eu-ai-act-compliance">EU AI Act</a>
 </p>
 
@@ -58,9 +57,6 @@ pip install chimera-compliance
 
 # With CSL-Core for Z3 formal verification (recommended)
 pip install chimera-compliance[csl]
-
-# With Pro features (license key required)
-pip install chimera-compliance[pro]
 
 # Everything
 pip install chimera-compliance[all]
@@ -124,85 +120,33 @@ chimera-compliance run
 chimera-compliance verify policies/governance.csl
 ```
 
-### Check license status
-
-```bash
-chimera-compliance license status
-```
-
 ## Dashboard
 
 **chimera-compliance** comes with a full-featured compliance dashboard at **[compliance.chimera-protocol.com](https://compliance.chimera-protocol.com)**.
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/Chimera-Protocol/chimera-compliance/main/.github/dashboard-preview.png" alt="Dashboard Preview" width="800">
+  <img src=".github/dashboard.png" alt="Dashboard — Real-time audit monitoring" width="800">
 </p>
 
-The dashboard provides:
+**Real-time audit monitoring** -- Live feed of agent decisions with ALLOW/BLOCK/ESCALATE status, EU AI Act compliance score, and top violations.
 
-- **Real-time audit monitoring** -- Live feed of agent decisions with ALLOW/BLOCK/ESCALATE status
-- **Policy management** -- Create, edit, and verify CSL/YAML policies with Z3 formal verification
-- **Analytics** -- Decision trends, violation rates, risk scores across agents
-- **Interactive demo** -- Try policy evaluation live in the browser
-- **SDK license key generation** -- Pro/Enterprise users generate license keys from Settings
+<p align="center">
+  <img src=".github/policy.png" alt="Policy Management" width="800">
+</p>
 
-## Pricing
+**Policy management** -- Create, edit, and verify CSL/YAML policies with Z3 formal verification. View constraints, variables, and policy hashes.
 
-chimera-compliance follows an **open-core model**. All code ships in a single PyPI package -- tier-gated features are unlocked with a license key.
+<p align="center">
+  <img src=".github/analytics.png" alt="Analytics" width="800">
+</p>
 
-| | **Free** | **Pro** | **Enterprise** |
-|---|:---:|:---:|:---:|
-| **Price** | $0 | $149/mo | $499/mo |
-| YAML + CSL Policy Engine | Unlimited | Unlimited | Unlimited |
-| Z3 Formal Verification | Unlimited | Unlimited | Unlimited |
-| Agent Integrations | All frameworks | All frameworks | All frameworks |
-| Audit Trail | 7 days | 90 days | Unlimited |
-| Halt/Resume (Art. 14) | -- | Yes | Yes |
-| Hot Reload Policies | -- | Yes | Yes |
-| Audit Export | -- | Yes | Yes |
-| HTML Reports | -- | Yes | Yes |
-| Annex IV Documentation | -- | -- | Yes |
-| SSO / SAML | -- | -- | Yes |
-| SIEM Integration | -- | -- | Yes |
-| White Label | -- | -- | Yes |
+**Analytics** -- Decision trends, block rate heatmaps, and violation frequency across all agents.
 
-**Activate a license:**
+<p align="center">
+  <img src=".github/framework.png" alt="Connect Agent Wizard" width="800">
+</p>
 
-```bash
-# Get your key from https://compliance.chimera-protocol.com/settings
-chimera-compliance license activate eyJhbGciOiJFZERTQSI...
-
-# Or via environment variable
-export CHIMERA_LICENSE_KEY=eyJhbGciOiJFZERTQSI...
-
-# Check status
-chimera-compliance license status
-```
-
-## Architecture
-
-```
-+------------------------------------------------------------+
-|                   chimera-compliance                        |
-|                                                             |
-|  +---------------+   +---------------+   +---------------+ |
-|  |  Integrations |   | Policy Engine |   |    Audit      | |
-|  |               |   |               |   |   Pipeline    | |
-|  | LangChain     |   | YAML Rules    |   |               | |
-|  | LangGraph     |-->|    -- or --   |-->| JSON Records  | |
-|  | LlamaIndex    |   | CSL + Z3      |   | HTML Reports  | |
-|  | CrewAI        |   | (optional)    |   | Query/Export   | |
-|  | AutoGen       |   |               |   |               | |
-|  | Raw LLMs      |   |               |   |               | |
-|  +---------------+   +---------------+   +---------------+ |
-|        |                   |                  |             |
-|  +---------------+   +---------------+   +---------------+ |
-|  |    Human      |   |     Docs      |   |     CLI       | |
-|  |  Oversight    |   |  Generator    |   |   (Rich)      | |
-|  |   Art. 14     |   |  Annex IV     |   |               | |
-|  +---------------+   +---------------+   +---------------+ |
-+------------------------------------------------------------+
-```
+**Connect Agent** -- 4-step wizard to integrate compliance guard into LangChain, LangGraph, CrewAI, LlamaIndex, or AutoGen.
 
 ## Agent Framework Integrations
 
@@ -276,7 +220,7 @@ print(result.action)       # "Allocate $200k to digital channels"
 | `chimera-compliance explain --id ID` | Generate Art. 86 HTML explanation |
 | `chimera-compliance docs generate` | Generate Annex IV documentation |
 | `chimera-compliance license status` | Show current license tier and details |
-| `chimera-compliance license activate KEY` | Activate a Pro/Enterprise license |
+| `chimera-compliance license activate KEY` | Activate a license |
 | `chimera-compliance license deactivate` | Remove license key |
 
 ## EU AI Act Compliance
@@ -310,7 +254,7 @@ print(result.action)       # "Allocate $200k to digital channels"
 ## Development
 
 ```bash
-git clone https://github.com/Chimera-Protocol/chimera-compliance
+git clone https://github.com/akarlaraytu/chimera-compliance
 cd chimera-compliance
 pip install -e ".[dev,all]"
 pytest tests/ -v
@@ -319,7 +263,7 @@ pytest tests/ -v
 ## Related Projects
 
 - **[CSL-Core](https://pypi.org/project/csl-core/)** -- Chimera Specification Language compiler and runtime
-- **[Chimera Protocol](https://compliance.chimera-protocol.com)** -- EU AI Act compliance dashboard
+- **[Chimera Compliance Dashboard](https://compliance.chimera-protocol.com)** -- EU AI Act compliance dashboard
 
 ## License
 
@@ -328,6 +272,6 @@ Apache License 2.0 -- see [LICENSE](LICENSE) for details.
 ---
 
 <p align="center">
-  <strong>Solidity for AI.</strong><br>
-  <sub>Built by <a href="https://github.com/Chimera-Protocol">Chimera Protocol</a></sub>
+  <strong>Building AI Governance.</strong><br>
+  <sub>Built by <a href="https://github.com/akarlaraytu">Aytug Akarlar</a></sub>
 </p>
