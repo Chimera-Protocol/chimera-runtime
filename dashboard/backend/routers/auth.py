@@ -38,6 +38,11 @@ class LoginRequest(BaseModel):
     password: str
 
 
+class ChangePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str
+
+
 # ── Endpoints ──────────────────────────────────────────────────────
 
 @router.post("/register")
@@ -58,6 +63,17 @@ async def login(body: LoginRequest):
     try:
         result = svc.login(body.email, body.password)
         return result
+    except AuthError as e:
+        raise HTTPException(status_code=e.status_code, detail=e.message)
+
+
+@router.post("/change-password")
+async def change_password(body: ChangePasswordRequest, user: dict = Depends(get_current_user)):
+    """Change password for authenticated user."""
+    svc = get_service()
+    try:
+        svc.change_password(user["id"], body.current_password, body.new_password)
+        return {"status": "ok", "message": "Password changed successfully"}
     except AuthError as e:
         raise HTTPException(status_code=e.status_code, detail=e.message)
 

@@ -78,6 +78,11 @@ export const api = {
         body: JSON.stringify({ email, password }),
       }),
     me: () => fetchApi<{ user: unknown }>("/auth/me"),
+    changePassword: (currentPassword: string, newPassword: string) =>
+      fetchApi<{ status: string; message: string }>("/auth/change-password", {
+        method: "POST",
+        body: JSON.stringify({ current_password: currentPassword, new_password: newPassword }),
+      }),
   },
 
   // ── Audit ─────────────────────────────────────────────────────────

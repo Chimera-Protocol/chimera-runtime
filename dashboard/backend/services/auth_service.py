@@ -13,6 +13,7 @@ from ..models.user import (
     get_user_by_email,
     get_user_by_id,
     update_last_login,
+    update_password,
     verify_password,
 )
 
@@ -66,6 +67,22 @@ class AuthService:
         update_last_login(self.db_path, user.id)
         token = self._create_token(user)
         return {"access_token": token, "token_type": "bearer", "user": user.to_public()}
+
+    def change_password(self, user_id: int, current_password: str, new_password: str) -> None:
+        """Change user's password after verifying current password."""
+        if not current_password or not new_password:
+            raise AuthError("Current and new passwords are required", 400)
+        if len(new_password) < 6:
+            raise AuthError("New password must be at least 6 characters", 400)
+
+        user = get_user_by_id(self.db_path, user_id)
+        if user is None:
+            raise AuthError("User not found")
+
+        if not verify_password(current_password, user.password_hash):
+            raise AuthError("Current password is incorrect")
+
+        update_password(self.db_path, user_id, new_password)
 
     def verify_token(self, token: str) -> dict:
         """Verify JWT token and return payload."""

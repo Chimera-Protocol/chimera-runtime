@@ -86,6 +86,13 @@ export default function SettingsPage() {
   const [agentsLoading, setAgentsLoading] = useState(true);
   const [togglingAgent, setTogglingAgent] = useState<string | null>(null);
 
+  // Password change state
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [changingPassword, setChangingPassword] = useState(false);
+  const [passwordMessage, setPasswordMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
   // Admin state
   const [adminStats, setAdminStats] = useState<AdminStats | null>(null);
   const [adminLoading, setAdminLoading] = useState(false);
@@ -196,6 +203,30 @@ export default function SettingsPage() {
     }
   };
 
+  const handleChangePassword = async () => {
+    if (newPassword !== confirmPassword) {
+      setPasswordMessage({ type: "error", text: "Passwords do not match" });
+      return;
+    }
+    if (newPassword.length < 6) {
+      setPasswordMessage({ type: "error", text: "Password must be at least 6 characters" });
+      return;
+    }
+    setChangingPassword(true);
+    setPasswordMessage(null);
+    try {
+      await api.auth.changePassword(currentPassword, newPassword);
+      setPasswordMessage({ type: "success", text: "Password changed successfully" });
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch {
+      setPasswordMessage({ type: "error", text: "Current password is incorrect" });
+    } finally {
+      setChangingPassword(false);
+    }
+  };
+
   const activeKeys = keys.filter((k) => !k.revoked);
   const revokedKeys = keys.filter((k) => k.revoked);
 
@@ -247,6 +278,70 @@ export default function SettingsPage() {
                   : "—"}
               </p>
             </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Change Password */}
+      <Card className="border-[#1e1e2e] bg-[#111119]">
+        <CardHeader>
+          <CardTitle className="text-white flex items-center gap-2">
+            <Shield className="h-5 w-5 text-[#6366f1]" />
+            Change Password
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-3 sm:grid-cols-3">
+            <div>
+              <label className="text-xs text-[#71717a] mb-1 block">Current Password</label>
+              <input
+                type="password"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                placeholder="••••••••"
+                className="w-full bg-[#0a0a0f] border border-[#1e1e2e] rounded-lg px-4 py-2 text-white placeholder:text-[#52525b] focus:border-[#6366f1] focus:ring-1 focus:ring-[#6366f1] outline-none text-sm"
+              />
+            </div>
+            <div>
+              <label className="text-xs text-[#71717a] mb-1 block">New Password</label>
+              <input
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="••••••••"
+                className="w-full bg-[#0a0a0f] border border-[#1e1e2e] rounded-lg px-4 py-2 text-white placeholder:text-[#52525b] focus:border-[#6366f1] focus:ring-1 focus:ring-[#6366f1] outline-none text-sm"
+              />
+            </div>
+            <div>
+              <label className="text-xs text-[#71717a] mb-1 block">Confirm Password</label>
+              <input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="••••••••"
+                onKeyDown={(e) => e.key === "Enter" && handleChangePassword()}
+                className="w-full bg-[#0a0a0f] border border-[#1e1e2e] rounded-lg px-4 py-2 text-white placeholder:text-[#52525b] focus:border-[#6366f1] focus:ring-1 focus:ring-[#6366f1] outline-none text-sm"
+              />
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <Button
+              onClick={handleChangePassword}
+              disabled={changingPassword || !currentPassword || !newPassword || !confirmPassword}
+              className="bg-[#6366f1] hover:bg-[#5558e6] text-white"
+            >
+              {changingPassword ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Key className="mr-2 h-4 w-4" />
+              )}
+              Update Password
+            </Button>
+            {passwordMessage && (
+              <span className={`text-sm ${passwordMessage.type === "success" ? "text-[#22c55e]" : "text-[#ef4444]"}`}>
+                {passwordMessage.text}
+              </span>
+            )}
           </div>
         </CardContent>
       </Card>

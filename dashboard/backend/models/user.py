@@ -124,3 +124,11 @@ def update_last_login(db_path: str, user_id: int) -> None:
 def verify_password(password: str, password_hash: str) -> bool:
     """Verify password against bcrypt hash."""
     return bcrypt.checkpw(password.encode(), password_hash.encode())
+
+
+def update_password(db_path: str, user_id: int, new_password: str) -> None:
+    """Update user's password."""
+    conn = _get_conn(db_path)
+    password_hash = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt()).decode()
+    conn.execute("UPDATE users SET password_hash = ? WHERE id = ?", (password_hash, user_id))
+    conn.commit()
