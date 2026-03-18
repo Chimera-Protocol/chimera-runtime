@@ -105,11 +105,14 @@ export function Sidebar() {
       {/* Logo */}
       <div className="flex h-16 items-center border-b border-[#1e1e2e] px-4">
         <Link href="/" className="flex items-center gap-2">
-          <Shield className="h-6 w-6 text-[#6366f1] shrink-0" />
+          <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-indigo-500/20 to-cyan-500/10 border border-indigo-500/30 flex items-center justify-center shrink-0">
+            <Shield className="h-4 w-4 text-indigo-400" />
+          </div>
           {!collapsed && (
-            <span className="text-lg font-bold text-white">
-              Chimera<span className="text-[#6366f1]">.</span>
-            </span>
+            <div className="flex items-baseline">
+              <span className="text-sm font-black text-white">Chimera</span>
+              <span className="text-sm font-black bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">Runtime</span>
+            </div>
           )}
         </Link>
       </div>

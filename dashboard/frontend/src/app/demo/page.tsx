@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { AuthNav } from "@/components/layout/AuthNav";
+import { PublicNav } from "@/components/layout/PublicNav";
 import {
   Shield,
   ArrowRight,
@@ -234,21 +234,7 @@ export default function DemoPage() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0f]">
-      {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-[#1e1e2e] bg-[#0a0a0f]/90 backdrop-blur">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
-          <Link href="/" className="flex items-center gap-2">
-            <Shield className="h-6 w-6 text-[#6366f1]" />
-            <span className="text-lg font-bold text-white">Chimera.</span>
-          </Link>
-          <div className="flex items-center gap-4">
-            <Link href="/docs" className="text-sm text-[#71717a] hover:text-white transition">
-              Docs
-            </Link>
-            <AuthNav />
-          </div>
-        </div>
-      </nav>
+      <PublicNav backLabel="Back to product" />
 
       <div className="mx-auto max-w-5xl px-6 pt-28 pb-20">
         {/* Header */}

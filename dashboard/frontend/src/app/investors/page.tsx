@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { PublicNav } from "@/components/layout/PublicNav";
 import {
   Shield,
   ArrowLeft,
@@ -41,23 +42,7 @@ export default function InvestorsPage() {
       <div className="absolute top-0 left-1/3 w-[600px] h-[600px] bg-[#6366f1]/5 rounded-full blur-[200px]" />
       <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-[#22c55e]/3 rounded-full blur-[180px]" />
 
-      {/* Nav */}
-      <nav className="fixed top-0 z-50 w-full border-b border-[#1e1e2e] bg-[#0a0a0f]/80 backdrop-blur-xl">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
-          <Link href="/" className="flex items-center gap-2">
-            <Shield className="h-6 w-6 text-[#6366f1]" />
-            <span className="text-lg font-bold text-white">
-              Chimera<span className="text-[#6366f1]">Runtime</span>
-            </span>
-          </Link>
-          <Link
-            href="/"
-            className="flex items-center gap-2 text-sm text-[#71717a] hover:text-white transition"
-          >
-            <ArrowLeft className="h-4 w-4" /> Back to product
-          </Link>
-        </div>
-      </nav>
+      <PublicNav backLabel="Back to product" />
 
       <div className="relative z-10 mx-auto max-w-4xl px-6 pt-32 pb-24">
         {/* Header */}
