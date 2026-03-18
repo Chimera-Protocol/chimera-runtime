@@ -7,12 +7,64 @@ import { ComplianceStatus } from "@/components/dashboard/ComplianceStatus";
 import { ViolationsChart } from "@/components/dashboard/ViolationsChart";
 import { api } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
+import { Info, X } from "lucide-react";
 import type {
   AuditStats,
   DecisionSummary,
   ComplianceStatus as ComplianceStatusType,
   ViolationCount,
 } from "@/lib/types";
+
+function DemoBanner() {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const dismissed = localStorage.getItem("chimera_demo_banner_dismissed");
+    if (!dismissed) setVisible(true);
+  }, []);
+
+  const dismiss = (permanent: boolean) => {
+    setVisible(false);
+    if (permanent) localStorage.setItem("chimera_demo_banner_dismissed", "1");
+  };
+
+  if (!visible) return null;
+
+  return (
+    <div className="relative rounded-xl border border-indigo-500/20 bg-indigo-500/[0.04] px-5 py-4 flex items-start gap-4">
+      <div className="mt-0.5 h-8 w-8 rounded-lg bg-indigo-500/10 flex items-center justify-center shrink-0">
+        <Info className="h-4 w-4 text-indigo-400" />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-medium text-white">Sample Data</p>
+        <p className="text-xs text-[#71717a] mt-1 leading-relaxed">
+          This dashboard is populated with sample audit records for demonstration purposes.
+          Connect your own agent via <span className="text-indigo-400 font-mono">pip install chimera-runtime</span> to see real enforcement data.
+        </p>
+        <div className="flex items-center gap-3 mt-3">
+          <button
+            onClick={() => dismiss(false)}
+            className="text-xs font-medium text-indigo-400 hover:text-indigo-300 transition"
+          >
+            Got it
+          </button>
+          <button
+            onClick={() => dismiss(true)}
+            className="text-xs text-[#52525b] hover:text-[#71717a] transition"
+          >
+            Don&apos;t show again
+          </button>
+        </div>
+      </div>
+      <button
+        onClick={() => dismiss(false)}
+        className="text-[#52525b] hover:text-white transition shrink-0"
+      >
+        <X className="h-4 w-4" />
+      </button>
+    </div>
+  );
+}
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -48,6 +100,9 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
+      {/* Demo Banner */}
+      <DemoBanner />
+
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-white">Dashboard</h1>
