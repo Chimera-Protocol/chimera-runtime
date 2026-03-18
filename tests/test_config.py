@@ -1,5 +1,5 @@
 """
-Tests for chimera_compliance.config
+Tests for chimera_runtime.config
 
 Validates:
   - YAML loading and parsing
@@ -16,13 +16,13 @@ from pathlib import Path
 
 import pytest
 
-from chimera_compliance.config import (
+from chimera_runtime.config import (
     load_config,
     save_config,
     validate_config,
     ConfigError,
 )
-from chimera_compliance.models import (
+from chimera_runtime.models import (
     AgentConfig,
     LLMConfig,
     PolicyConfig,
@@ -243,7 +243,7 @@ class TestSaveConfig:
         cfg = AgentConfig()
         path = save_config(cfg, str(tmp_dir / "config.yaml"))
         content = path.read_text()
-        assert "chimera-compliance configuration" in content
+        assert "chimera-runtime configuration" in content
         assert "CHIMERA_API_KEY" in content
 
     def test_roundtrip_save_load(self, tmp_dir):

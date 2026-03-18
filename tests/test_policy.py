@@ -1,10 +1,10 @@
 """
-Tests for chimera_compliance.policy
+Tests for chimera_runtime.policy
 
 Validates:
   - Policy loading from .csl files via csl-core
   - Evaluation returns correct ALLOWED/BLOCKED results
-  - Violations are correctly mapped to chimera-compliance Violation objects
+  - Violations are correctly mapped to chimera-runtime Violation objects
   - SHA256 hash computation and tamper detection
   - Hot-reload detects file changes
   - Metadata extraction (domain name, constraints, variables)
@@ -16,12 +16,12 @@ from pathlib import Path
 
 import pytest
 
-from chimera_compliance.policy import (
+from chimera_runtime.policy import (
     PolicyManager,
     PolicyError,
     PolicyFileNotFoundError,
 )
-from chimera_compliance.models import PolicyEvaluation, Violation
+from chimera_runtime.models import PolicyEvaluation, Violation
 
 
 # ============================================================================

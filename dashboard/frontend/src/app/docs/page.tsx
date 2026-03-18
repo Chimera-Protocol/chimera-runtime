@@ -64,7 +64,7 @@ export default function DocsPage() {
       <div className="mb-10">
         <h1 className="text-3xl font-bold text-white mb-2">Documentation</h1>
         <p className="text-[#71717a] max-w-2xl">
-          Everything you need to integrate chimera-compliance into your AI agents.
+          Everything you need to integrate Chimera Runtime into your AI agents.
           From quickstart guides to full API reference.
         </p>
       </div>

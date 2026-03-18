@@ -52,7 +52,7 @@ export default function DashboardPage() {
       <div>
         <h1 className="text-2xl font-bold text-white">Dashboard</h1>
         <p className="mt-1 text-sm text-[#71717a]">
-          Real-time compliance monitoring overview
+          Real-time enforcement monitoring overview
         </p>
       </div>
 

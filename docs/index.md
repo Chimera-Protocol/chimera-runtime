@@ -1,14 +1,14 @@
-# chimera-compliance Documentation
+# chimera-runtime Documentation
 
-**EU AI Act Compliant Agent Compliance Layer**
+**EU AI Act Compliant Deterministic Runtime**
 
 Every AI decision formally verified. Every step logged. Every action auditable.
 
 ---
 
-## What is chimera-compliance?
+## What is chimera-runtime?
 
-chimera-compliance is a plug-in compliance layer for AI agents. It sits between your AI agent framework and the actions your agents take, providing:
+chimera-runtime is a plug-in deterministic runtime for AI agents. It sits between your AI agent framework and the actions your agents take, providing:
 
 - **Deterministic policy enforcement** — BLOCK, ALLOW, or ASK_HUMAN before every action
 - **Full audit trail** — every decision recorded per EU AI Act requirements
@@ -16,7 +16,7 @@ chimera-compliance is a plug-in compliance layer for AI agents. It sits between 
 - **Two policy engines** — lightweight YAML rules (built-in) or CSL + Z3 formal verification (optional)
 
 ```
-pip install chimera-compliance
+pip install chimera-runtime
 ```
 
 ---
@@ -37,11 +37,11 @@ pip install chimera-compliance
 
 ## Quick Links
 
-- **Install**: `pip install chimera-compliance`
-- **Initialize**: `chimera-compliance init`
-- **Test setup**: `chimera-compliance test --skip-llm`
-- **Verify policy**: `chimera-compliance verify policies/governance.yaml`
-- **Simulate**: `chimera-compliance policy simulate policies/governance.yaml '{"amount": 50000, "role": "MANAGER"}'`
+- **Install**: `pip install chimera-runtime`
+- **Initialize**: `chimera-runtime init`
+- **Test setup**: `chimera-runtime test --skip-llm`
+- **Verify policy**: `chimera-runtime verify policies/governance.yaml`
+- **Simulate**: `chimera-runtime policy simulate policies/governance.yaml '{"amount": 50000, "role": "MANAGER"}'`
 
 ---
 
@@ -54,21 +54,21 @@ pip install chimera-compliance
 
 ```bash
 # Z3 formal verification
-pip install chimera-compliance[csl]
+pip install chimera-runtime[csl]
 
 # LLM providers
-pip install chimera-compliance[openai]
-pip install chimera-compliance[anthropic]
-pip install chimera-compliance[google]
-pip install chimera-compliance[ollama]
+pip install chimera-runtime[openai]
+pip install chimera-runtime[anthropic]
+pip install chimera-runtime[google]
+pip install chimera-runtime[ollama]
 
 # Agent frameworks
-pip install chimera-compliance[langchain]
-pip install chimera-compliance[langgraph]
-pip install chimera-compliance[llamaindex]
-pip install chimera-compliance[crewai]
-pip install chimera-compliance[autogen]
+pip install chimera-runtime[langchain]
+pip install chimera-runtime[langgraph]
+pip install chimera-runtime[llamaindex]
+pip install chimera-runtime[crewai]
+pip install chimera-runtime[autogen]
 
 # Everything
-pip install chimera-compliance[all]
+pip install chimera-runtime[all]
 ```

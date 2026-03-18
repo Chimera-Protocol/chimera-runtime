@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Generate realistic demo audit records for the Chimera Compliance Dashboard.
+Generate realistic demo audit records for the Chimera Runtime Dashboard.
 
 Usage:
     python3 generate_demo_data.py
@@ -18,10 +18,10 @@ from datetime import datetime, timezone, timedelta
 # Ensure project root is on path
 sys.path.insert(0, os.path.dirname(__file__))
 
-from chimera_compliance.llm.base import BaseLLMProvider
-from chimera_compliance.policy import PolicyManager
-from chimera_compliance.agent import ChimeraAgent
-from chimera_compliance.oversight import HumanOversight
+from chimera_runtime.llm.base import BaseLLMProvider
+from chimera_runtime.policy import PolicyManager
+from chimera_runtime.agent import ChimeraAgent
+from chimera_runtime.oversight import HumanOversight
 
 
 # ============================================================================
@@ -218,7 +218,7 @@ def main():
         print(f"Policy file not found: {policy_path}")
         sys.exit(1)
 
-    print(f"\n  Chimera Compliance — Demo Data Generator")
+    print(f"\n  Chimera Runtime — Demo Data Generator")
     print(f"  Policy: {policy_path}")
     print(f"  Audit dir: {audit_dir}")
     print(f"  Scenarios: {len(SCENARIOS)}")
@@ -236,7 +236,7 @@ def main():
             api_key="demo",
             policy=policy_path,
             llm_provider=llm,
-            agent_name="chimera-compliance-guard",
+            agent_name="chimera-runtime-guard",
             audit_dir=audit_dir,
             max_retries=1,
             candidates_per_attempt=3,
@@ -266,7 +266,7 @@ def main():
             print(f"  {i+1:2d}. \033[93mERROR\033[0m    {scenario['request'][:50]}  ({e})")
 
     # Count results
-    from chimera_compliance.audit.query import AuditQuery
+    from chimera_runtime.audit.query import AuditQuery
     query = AuditQuery(audit_dir)
     query.refresh()
     stats = query.stats()

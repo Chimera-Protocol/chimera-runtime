@@ -3,7 +3,7 @@ License Key Service — Generate signed JWT license keys for the SDK.
 
 Uses Ed25519 asymmetric signing:
   - Private key: stays on this server (CHIMERA_LICENSE_PRIVATE_KEY env var)
-  - Public key: embedded in the chimera-compliance PyPI package
+  - Public key: embedded in the chimera-runtime PyPI package
 """
 
 from __future__ import annotations
@@ -60,7 +60,7 @@ def generate_license_key(
     validity_days: int = 365,
 ) -> str:
     """
-    Generate a signed Ed25519 JWT license key for the chimera-compliance SDK.
+    Generate a signed Ed25519 JWT license key for the chimera-runtime SDK.
 
     Args:
         user_id: User ID from dashboard
@@ -93,7 +93,7 @@ def generate_license_key(
         "features": TIER_FEATURES.get(tier, []),
         "iat": now,
         "exp": now + (validity_days * 86400),
-        "iss": "chimera-compliance",
+        "iss": "chimera-runtime",
         "aud": "chimera-sdk",
     }
 

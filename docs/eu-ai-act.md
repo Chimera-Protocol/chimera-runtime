@@ -1,12 +1,12 @@
 # EU AI Act Compliance Mapping
 
-How chimera-compliance maps to specific EU AI Act articles and requirements.
+How chimera-runtime maps to specific EU AI Act articles and requirements.
 
 ---
 
 ## Overview
 
-The EU AI Act (Regulation 2024/1689) establishes harmonized rules for AI systems in the European Union. chimera-compliance addresses the requirements for **high-risk AI systems** (Title III, Chapter 2) by providing deterministic policy enforcement, comprehensive audit trails, human oversight mechanisms, and transparency guarantees.
+The EU AI Act (Regulation 2024/1689) establishes harmonized rules for AI systems in the European Union. chimera-runtime addresses the requirements for **high-risk AI systems** (Title III, Chapter 2) by providing deterministic policy enforcement, comprehensive audit trails, human oversight mechanisms, and transparency guarantees.
 
 ---
 
@@ -16,15 +16,15 @@ The EU AI Act (Regulation 2024/1689) establishes harmonized rules for AI systems
 
 > High-risk AI systems shall have a risk management system established, implemented, documented, and maintained.
 
-**chimera-compliance implementation:**
+**chimera-runtime implementation:**
 
 | Requirement | Implementation |
 |-------------|---------------|
 | Risk identification | Policy rules define risk boundaries (amount limits, role restrictions, action constraints) |
 | Risk evaluation | Every action is evaluated against the policy before execution |
 | Risk mitigation | BLOCK action prevents execution of non-compliant actions |
-| Continuous monitoring | Audit trail tracks all decisions over time; `chimera-compliance audit --stats` provides aggregate risk analysis |
-| Documentation | `chimera-compliance docs generate` produces Annex IV documentation |
+| Continuous monitoring | Audit trail tracks all decisions over time; `chimera-runtime audit --stats` provides aggregate risk analysis |
+| Documentation | `chimera-runtime docs generate` produces Annex IV documentation |
 
 **How to use:**
 
@@ -43,7 +43,7 @@ rules:
 
 > High-risk AI systems shall technically allow for the automatic recording of events (logs) over the lifetime of the system.
 
-**chimera-compliance implementation:**
+**chimera-runtime implementation:**
 
 | Requirement | Implementation |
 |-------------|---------------|
@@ -71,16 +71,16 @@ DecisionAuditRecord
 
 ```bash
 # View recent decisions
-chimera-compliance audit --last 20
+chimera-runtime audit --last 20
 
 # Filter by result
-chimera-compliance audit --result BLOCKED
+chimera-runtime audit --result BLOCKED
 
 # Aggregate statistics
-chimera-compliance audit --stats
+chimera-runtime audit --stats
 
 # Export for external analysis
-chimera-compliance audit --export report.json --format compact
+chimera-runtime audit --export report.json --format compact
 ```
 
 ---
@@ -89,7 +89,7 @@ chimera-compliance audit --export report.json --format compact
 
 > High-risk AI systems shall be designed and developed in such a way as to ensure that their operation is sufficiently transparent to enable deployers to interpret the system's output and use it appropriately.
 
-**chimera-compliance implementation:**
+**chimera-runtime implementation:**
 
 | Requirement | Implementation |
 |-------------|---------------|
@@ -116,12 +116,12 @@ result.audit        # Full audit record with reasoning trace
 
 > High-risk AI systems shall be designed and developed in such a way as to enable effective human oversight during the period of use.
 
-**chimera-compliance implementation:**
+**chimera-runtime implementation:**
 
 | Requirement | Implementation |
 |-------------|---------------|
 | Art. 14(1) — Oversight capability | `HumanOversight` class with three modes: `auto`, `interactive`, `sdk` |
-| Art. 14(3a) — Understanding capabilities | Policy files are human-readable; `chimera-compliance explain` generates explanation reports |
+| Art. 14(3a) — Understanding capabilities | Policy files are human-readable; `chimera-runtime explain` generates explanation reports |
 | Art. 14(3b) — Remaining aware of automation bias | All decisions show violations and reasoning, even when ALLOWED |
 | Art. 14(3c) — Correctly interpret output | `DecisionResult` provides structured, interpretable output |
 | Art. 14(3d) — Override/reverse | `apply_override()` method; `--require-confirmation` CLI flag |
@@ -130,7 +130,7 @@ result.audit        # Full audit record with reasoning trace
 **Oversight modes:**
 
 ```python
-from chimera_compliance import ChimeraAgent, HumanOversight
+from chimera_runtime import ChimeraAgent, HumanOversight
 
 # Auto mode (testing/batch)
 agent = ChimeraAgent(oversight=HumanOversight(mode="auto"))
@@ -161,7 +161,7 @@ agent.resume()
 
 ```bash
 # Require confirmation for each decision
-chimera-compliance run --require-confirmation
+chimera-runtime run --require-confirmation
 
 # During interactive session, type "halt" to stop
 ```
@@ -172,7 +172,7 @@ chimera-compliance run --require-confirmation
 
 > High-risk AI systems shall be designed and developed in such a way that they achieve an appropriate level of accuracy, robustness, and cybersecurity.
 
-**chimera-compliance implementation:**
+**chimera-runtime implementation:**
 
 | Requirement | Implementation |
 |-------------|---------------|
@@ -187,7 +187,7 @@ The YAML rule engine parses expressions using Python's `ast` module and walks th
 **Z3 formal verification** (CSL backend):
 
 ```bash
-chimera-compliance verify policies/governance.csl
+chimera-runtime verify policies/governance.csl
 ```
 
 Verification pipeline:
@@ -202,7 +202,7 @@ Verification pipeline:
 
 > The logs referred to in Article 12 shall be kept for a period that is appropriate in the light of the intended purpose of the high-risk AI system, of at least six months.
 
-**chimera-compliance implementation:**
+**chimera-runtime implementation:**
 
 | Requirement | Implementation |
 |-------------|---------------|
@@ -219,7 +219,7 @@ audit:
 ```
 
 ```python
-from chimera_compliance import enforce_retention
+from chimera_runtime import enforce_retention
 
 # Remove records older than configured retention period
 # Note: enforce_retention() defaults to 90 days if retention_days is not specified.
@@ -233,19 +233,19 @@ enforce_retention(audit_dir="./audit_logs", retention_days=180)
 
 > Any affected person subject to a decision which is taken by the deployer on the basis of the output from a high-risk AI system shall have the right to obtain clear and meaningful explanations of the role of the AI system in the decision-making procedure and the main elements of the decision taken.
 
-**chimera-compliance implementation:**
+**chimera-runtime implementation:**
 
 | Requirement | Implementation |
 |-------------|---------------|
 | Clear explanation | `DecisionResult.explanation` provides human-readable reasoning |
 | Meaningful details | Full reasoning trace: all candidates, all violations, selection reasoning |
-| Self-contained report | `chimera-compliance explain --id <id>` generates HTML report |
+| Self-contained report | `chimera-runtime explain --id <id>` generates HTML report |
 | Accessible format | HTML reports viewable in any browser; JSON for programmatic access |
 
 **Generate explanation report:**
 
 ```bash
-chimera-compliance explain --id dec_a1b2c3d4e5f6 --open
+chimera-runtime explain --id dec_a1b2c3d4e5f6 --open
 ```
 
 The HTML report includes:
@@ -266,10 +266,10 @@ The HTML report includes:
 > (b) A detailed description of the elements and development process
 > ...
 
-**chimera-compliance implementation:**
+**chimera-runtime implementation:**
 
 ```bash
-chimera-compliance docs generate
+chimera-runtime docs generate
 ```
 
 Generates Annex IV compliant technical documentation including:
@@ -315,7 +315,7 @@ Every `DecisionAuditRecord` includes a compliance section:
 
 ## Summary
 
-| EU AI Act Article | chimera-compliance Feature |
+| EU AI Act Article | chimera-runtime Feature |
 |-------------------|---------------------------|
 | Art. 9 — Risk Management | Policy rules define risk boundaries; continuous audit |
 | Art. 12 — Record-keeping | Automatic `DecisionAuditRecord` for every decision |

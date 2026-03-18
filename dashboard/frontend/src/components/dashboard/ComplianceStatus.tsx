@@ -24,7 +24,7 @@ export function ComplianceStatus({ status, loading }: ComplianceStatusProps) {
     return (
       <Card className="border-[#1e1e2e] bg-[#111119]">
         <CardHeader>
-          <CardTitle className="text-white">EU AI Act Compliance</CardTitle>
+          <CardTitle className="text-white">EU AI Act Enforcement</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-32 animate-pulse rounded bg-[#1e1e2e]" />
@@ -42,7 +42,7 @@ export function ComplianceStatus({ status, loading }: ComplianceStatusProps) {
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="text-white flex items-center gap-2">
           <Shield className="h-5 w-5 text-[#6366f1]" />
-          EU AI Act Compliance
+          EU AI Act Enforcement
         </CardTitle>
         <Badge
           variant="outline"

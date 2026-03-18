@@ -3,9 +3,9 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "chimera-compliance"
+name = "chimera-runtime"
 version = "1.0.0"
-description = "EU AI Act compliant AI agent compliance layer — plug into any agent framework, enforce deterministic policy guards, audit every decision."
+description = "Deterministic runtime for AI agents — enforce constraints, verify policies, audit decisions"
 readme = "README.md"
 license = "Apache-2.0"
 requires-python = ">=3.10"
@@ -15,14 +15,14 @@ authors = [
 keywords = [
     "ai-agent",
     "ai-safety",
-    "eu-ai-act",
+    "runtime",
     "formal-verification",
-    "compliance",
+    "policy-enforcement",
     "audit",
     "csl",
     "z3",
     "neuro-symbolic",
-    "policy-engine",
+    "deterministic-runtime",
     "langchain",
     "langgraph",
     "llamaindex",
@@ -52,10 +52,10 @@ dependencies = [
     "rich>=13.0.0",
     "click>=8.0",
     "jinja2>=3.0",
+    "csl-core>=0.3.0",
 ]
 
 [project.optional-dependencies]
-csl = ["csl-core>=0.3.0"]
 openai = ["openai>=1.0"]
 anthropic = ["anthropic>=0.40"]
 google = ["google-generativeai>=0.5"]
@@ -67,7 +67,7 @@ crewai = ["crewai>=0.80.0"]
 autogen = ["autogen-agentchat>=0.4.0"]
 pro = ["PyJWT[crypto]>=2.8.0"]
 all = [
-    "chimera-compliance[csl,openai,anthropic,google,ollama,langchain,langgraph,llamaindex,crewai,autogen,pro]",
+    "chimera-runtime[openai,anthropic,google,ollama,langchain,langgraph,llamaindex,crewai,autogen,pro]",
 ]
 dev = [
     "pytest>=7.0",
@@ -77,22 +77,22 @@ dev = [
 ]
 
 [project.scripts]
-chimera-compliance = "chimera_compliance.cli.main:cli"
+chimera-runtime = "chimera_runtime.cli.main:cli"
 
 [project.urls]
-Homepage = "https://compliance.chimera-protocol.com"
-Documentation = "https://compliance.chimera-protocol.com/docs"
-Dashboard = "https://compliance.chimera-protocol.com"
+Homepage = "https://runtime.chimera-protocol.com"
+Documentation = "https://runtime.chimera-protocol.com/docs"
+Dashboard = "https://runtime.chimera-protocol.com"
 
 [tool.hatch.build.targets.wheel]
-packages = ["chimera_compliance"]
+packages = ["chimera_runtime"]
 
 [tool.hatch.build.targets.wheel.force-include]
-"policies" = "chimera_compliance/_bundled_policies"
+"policies" = "chimera_runtime/_bundled_policies"
 
 [tool.hatch.build.targets.sdist]
 include = [
-    "chimera_compliance/",
+    "chimera_runtime/",
     "policies/",
     "tests/",
     "README.md",
@@ -118,7 +118,7 @@ select = ["E", "F", "W", "I", "UP", "B", "SIM"]
 ignore = ["E501"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["chimera_compliance"]
+known-first-party = ["chimera_runtime"]
 
 [tool.mypy]
 python_version = "3.10"
@@ -127,8 +127,8 @@ warn_unused_configs = true
 disallow_untyped_defs = true
 
 [tool.coverage.run]
-source = ["chimera_compliance"]
-omit = ["chimera_compliance/cli/*"]
+source = ["chimera_runtime"]
+omit = ["chimera_runtime/cli/*"]
 
 [tool.coverage.report]
 show_missing = true

@@ -1,5 +1,5 @@
 """
-Tests for chimera_compliance.agent and chimera_compliance.oversight
+Tests for chimera_runtime.agent and chimera_runtime.oversight
 
 Validates the full neuro→symbolic→audit pipeline:
   - ChimeraAgent.decide() with mock LLM + real CSL policy
@@ -18,10 +18,10 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 from unittest.mock import MagicMock
 
-from chimera_compliance.agent import ChimeraAgent, ChimeraAgentError, AgentHalted
-from chimera_compliance.oversight import HumanOversight, OversightError
-from chimera_compliance.llm.base import BaseLLMProvider, LLMError
-from chimera_compliance.models import (
+from chimera_runtime.agent import ChimeraAgent, ChimeraAgentError, AgentHalted
+from chimera_runtime.oversight import HumanOversight, OversightError
+from chimera_runtime.llm.base import BaseLLMProvider, LLMError
+from chimera_runtime.models import (
     Candidate,
     DecisionResult,
     DecisionAuditRecord,
@@ -30,7 +30,7 @@ from chimera_compliance.models import (
     generate_candidate_id,
     SCHEMA_VERSION,
 )
-from chimera_compliance.policy import PolicyManager
+from chimera_runtime.policy import PolicyManager
 
 
 # ============================================================================
@@ -361,7 +361,7 @@ class TestAuditRecord:
         result = agent.decide("Budget request")
         ai = result.audit.agent
 
-        assert ai.name == "chimera-compliance"
+        assert ai.name == "chimera-runtime"
         assert ai.version == "0.1.0"
         assert ai.model == "mock-model"
         assert ai.model_provider == "mock"
@@ -692,7 +692,7 @@ class TestFromConfig:
 
     def test_from_config_with_defaults(self):
         """from_config with default config should create a working agent."""
-        from chimera_compliance.models import AgentConfig
+        from chimera_runtime.models import AgentConfig
         config = AgentConfig()
         config.policy.file = str(GOVERNANCE_CSL)
         config.llm.api_key = "test-key"
@@ -703,7 +703,7 @@ class TestFromConfig:
 
     def test_from_config_with_overrides(self):
         """Overrides should take precedence over config."""
-        from chimera_compliance.models import AgentConfig
+        from chimera_runtime.models import AgentConfig
         config = AgentConfig()
         config.policy.file = str(GOVERNANCE_CSL)
 

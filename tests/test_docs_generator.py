@@ -1,5 +1,5 @@
 """
-Tests for chimera_compliance.docs
+Tests for chimera_runtime.docs
 
 Validates:
   - AnnexIVGenerator.generate() produces complete Markdown
@@ -18,14 +18,14 @@ import pytest
 from pathlib import Path
 from typing import List
 
-from chimera_compliance.docs import (
+from chimera_runtime.docs import (
     AnnexIVGenerator,
     DocsGeneratorError,
     AUTO_SECTIONS,
     MANUAL_SECTIONS,
     SECTION_TITLES,
 )
-from chimera_compliance.models import (
+from chimera_runtime.models import (
     AgentConfig,
     AgentMetaConfig,
     AuditConfig,
@@ -33,7 +33,7 @@ from chimera_compliance.models import (
     OversightConfig,
     PolicyConfig,
 )
-from chimera_compliance.audit.storage import save_record
+from chimera_runtime.audit.storage import save_record
 
 
 # ============================================================================
@@ -64,7 +64,7 @@ def _jinja2_available() -> bool:
 def config():
     """Sample agent config for doc generation."""
     return AgentConfig(
-        agent=AgentMetaConfig(name="test-chimera-compliance", version="0.2.0"),
+        agent=AgentMetaConfig(name="test-chimera-runtime", version="0.2.0"),
         llm=LLMConfig(
             provider="openai",
             model="gpt-4o",
@@ -108,11 +108,11 @@ def output_dir(tmp_path):
 
 def _populate_audit(audit_dir: str, n_allowed: int = 4, n_blocked: int = 2):
     """Create sample audit records for testing."""
-    from chimera_compliance.models import (
+    from chimera_runtime.models import (
         AgentInfo, InputInfo, Attempt, Candidate, PolicyEvaluation,
         Violation, generate_decision_id, utc_now_iso,
     )
-    from chimera_compliance.audit.recorder import build_audit_record
+    from chimera_runtime.audit.recorder import build_audit_record
 
     for i in range(n_allowed):
         record = build_audit_record(
@@ -237,7 +237,7 @@ class TestGenerateWithPolicy:
 
         content = Path(out).read_text()
         assert "# EU AI Act — Annex IV Technical Documentation" in content
-        assert "test-chimera-compliance" in content
+        assert "test-chimera-runtime" in content
         assert "0.2.0" in content
 
     def test_all_19_section_headers_present(self, config, output_dir):
@@ -444,7 +444,7 @@ class TestEdgeCases:
 
         assert os.path.exists(path)
         content = Path(out).read_text()
-        assert "chimera-compliance" in content
+        assert "chimera-runtime" in content
 
     def test_nonexistent_policy_graceful(self, output_dir):
         """Should still generate even if policy file doesn't exist."""

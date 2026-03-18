@@ -1,6 +1,6 @@
 # API Reference
 
-Complete Python SDK reference for chimera-compliance v3.0.0.
+Complete Python SDK reference for chimera-runtime v3.0.0.
 
 ---
 
@@ -11,7 +11,7 @@ Complete Python SDK reference for chimera-compliance v3.0.0.
 The central orchestrator for standalone mode. Manages the full neural → symbolic → audit pipeline.
 
 ```python
-from chimera_compliance import ChimeraAgent
+from chimera_runtime import ChimeraAgent
 ```
 
 **Constructor:**
@@ -29,7 +29,7 @@ ChimeraAgent(
     oversight: Optional[HumanOversight] = None,
     llm_provider: Optional[BaseLLMProvider] = None,
     policy_manager: Optional[PolicyManager] = None,
-    agent_name: str = "chimera-compliance",
+    agent_name: str = "chimera-runtime",
     audit_dir: Optional[str] = None,
 )
 ```
@@ -47,7 +47,7 @@ ChimeraAgent(
 | `oversight` | `HumanOversight\|None` | `None` | Human oversight controller (defaults to auto-approve) |
 | `llm_provider` | `BaseLLMProvider\|None` | `None` | Pre-configured LLM provider (overrides model/api_key/provider) |
 | `policy_manager` | `PolicyManager\|None` | `None` | Pre-configured PolicyManager (overrides policy path) |
-| `agent_name` | `str` | `"chimera-compliance"` | Name for audit records |
+| `agent_name` | `str` | `"chimera-runtime"` | Name for audit records |
 | `audit_dir` | `str\|None` | `None` | Directory to persist audit records (`None` = no auto-save) |
 
 **Methods:**
@@ -106,7 +106,7 @@ Resume a halted agent.
 Unified interface for policy evaluation. Auto-selects backend based on file extension.
 
 ```python
-from chimera_compliance import PolicyManager
+from chimera_runtime import PolicyManager
 ```
 
 **Constructor:**
@@ -177,7 +177,7 @@ Non-throwing reload. Returns `True` if reloaded, `False` otherwise. Never raises
 Built-in YAML rule evaluation engine. Used by `PolicyManager` for `.yaml`/`.yml` files.
 
 ```python
-from chimera_compliance import YAMLRuleEngine
+from chimera_runtime import YAMLRuleEngine
 ```
 
 **Constructor:**
@@ -197,7 +197,7 @@ YAMLRuleEngine(policy_path: str, dry_run: bool = False)
 EU AI Act Article 14 compliance: humans can confirm, override, or stop decisions.
 
 ```python
-from chimera_compliance import HumanOversight
+from chimera_runtime import HumanOversight
 ```
 
 **Constructor:**
@@ -243,7 +243,7 @@ All models are `@dataclass` with `to_dict()` and `from_dict()` methods.
 Return type from `ChimeraAgent.decide()`.
 
 ```python
-from chimera_compliance import DecisionResult
+from chimera_runtime import DecisionResult
 ```
 
 | Field | Type | Description |
@@ -275,7 +275,7 @@ from chimera_compliance import DecisionResult
 The atomic, immutable audit unit. 8 sections per EU AI Act requirements.
 
 ```python
-from chimera_compliance import DecisionAuditRecord
+from chimera_runtime import DecisionAuditRecord
 ```
 
 | Field | Type | Description |
@@ -309,7 +309,7 @@ from chimera_compliance import DecisionAuditRecord
 Result of evaluating parameters against a policy.
 
 ```python
-from chimera_compliance import PolicyEvaluation
+from chimera_runtime import PolicyEvaluation
 ```
 
 | Field | Type | Description |
@@ -327,7 +327,7 @@ from chimera_compliance import PolicyEvaluation
 A single policy violation.
 
 ```python
-from chimera_compliance import Violation
+from chimera_runtime import Violation
 ```
 
 | Field | Type | Description |
@@ -344,7 +344,7 @@ from chimera_compliance import Violation
 A single strategy candidate from the LLM.
 
 ```python
-from chimera_compliance import Candidate
+from chimera_runtime import Candidate
 ```
 
 | Field | Type | Description |
@@ -363,7 +363,7 @@ from chimera_compliance import Candidate
 A single attempt round in the retry loop.
 
 ```python
-from chimera_compliance import Attempt
+from chimera_runtime import Attempt
 ```
 
 | Field | Type | Description |
@@ -382,7 +382,7 @@ from chimera_compliance import Attempt
 Complete agent configuration. Maps to `.chimera/config.yaml`.
 
 ```python
-from chimera_compliance import AgentConfig
+from chimera_runtime import AgentConfig
 ```
 
 | Field | Type | Description |
@@ -506,7 +506,7 @@ from chimera_compliance import AgentConfig
 ### `DecisionResultType`
 
 ```python
-from chimera_compliance import DecisionResultType
+from chimera_runtime import DecisionResultType
 
 DecisionResultType.ALLOWED        # "ALLOWED"
 DecisionResultType.BLOCKED        # "BLOCKED"
@@ -517,7 +517,7 @@ DecisionResultType.INTERRUPTED    # "INTERRUPTED"
 ### `AttemptOutcome`
 
 ```python
-from chimera_compliance import AttemptOutcome
+from chimera_runtime import AttemptOutcome
 
 AttemptOutcome.ALL_PASSED  # "ALL_PASSED"
 AttemptOutcome.PARTIAL     # "PARTIAL"
@@ -527,7 +527,7 @@ AttemptOutcome.ALL_BLOCKED # "ALL_BLOCKED"
 ### `EnforcementType`
 
 ```python
-from chimera_compliance import EnforcementType
+from chimera_runtime import EnforcementType
 
 EnforcementType.ACTIVE   # "ACTIVE"
 EnforcementType.DRY_RUN  # "DRY_RUN"
@@ -542,7 +542,7 @@ EnforcementType.DRY_RUN  # "DRY_RUN"
 Core guard shared by all integrations.
 
 ```python
-from chimera_compliance.integrations import ComplianceGuard
+from chimera_runtime.integrations import ComplianceGuard
 ```
 
 **Constructor:**
@@ -579,7 +579,7 @@ Evaluate an action against the policy. Automatically records audit.
 Exception raised when an action is blocked.
 
 ```python
-from chimera_compliance.integrations.base import ComplianceError
+from chimera_runtime.integrations.base import ComplianceError
 ```
 
 | Attribute | Type | Description |
@@ -591,7 +591,7 @@ from chimera_compliance.integrations.base import ComplianceError
 ## Audit Functions
 
 ```python
-from chimera_compliance import (
+from chimera_runtime import (
     build_audit_record,
     save_record,
     load_record,
@@ -658,7 +658,7 @@ query.export("report.json", format="compact")
 ## Config Functions
 
 ```python
-from chimera_compliance import load_config, save_config, validate_config
+from chimera_runtime import load_config, save_config, validate_config
 ```
 
 ### `load_config(config_path) → AgentConfig`
@@ -678,7 +678,7 @@ Validate config. Raises `ConfigError` on invalid config.
 ## Helper Functions
 
 ```python
-from chimera_compliance import generate_decision_id, generate_candidate_id, utc_now_iso
+from chimera_runtime import generate_decision_id, generate_candidate_id, utc_now_iso
 ```
 
 ### `generate_decision_id() → str`
@@ -699,24 +699,24 @@ ISO 8601 UTC timestamp with millisecond precision.
 
 | Exception | Module | Description |
 |-----------|--------|-------------|
-| `ChimeraAgentError` | `chimera_compliance.agent` | Base agent error |
-| `AgentHalted` | `chimera_compliance.agent` | Agent has been halted (Art. 14) |
-| `PolicyError` | `chimera_compliance.policy` | Policy load/eval/verify error |
-| `PolicyFileNotFoundError` | `chimera_compliance.policy` | Policy file does not exist |
-| `PolicyVerificationError` | `chimera_compliance.policy` | Z3 verification failed |
-| `RuleEngineError` | `chimera_compliance.rules` | YAML rule engine error |
-| `RuleParseError` | `chimera_compliance.rules` | Expression parse error |
-| `ComplianceError` | `chimera_compliance.integrations.base` | Action blocked by policy |
-| `OversightError` | `chimera_compliance.oversight` | Oversight operation error |
-| `OversightTimeoutError` | `chimera_compliance.oversight` | Human confirmation timeout |
-| `ConfigError` | `chimera_compliance.config` | Config load/validate error |
-| `AuditStorageError` | `chimera_compliance.audit.storage` | Audit I/O error |
-| `LLMError` | `chimera_compliance.llm` | LLM provider error |
-| `LLMAuthenticationError` | `chimera_compliance.llm` | Invalid API key |
-| `LLMRateLimitError` | `chimera_compliance.llm` | Rate limit exceeded |
-| `LLMTimeoutError` | `chimera_compliance.llm` | LLM request timeout |
-| `LLMResponseParseError` | `chimera_compliance.llm` | Cannot parse LLM response |
-| `DocsGeneratorError` | `chimera_compliance.docs` | Documentation generation error |
+| `ChimeraAgentError` | `chimera_runtime.agent` | Base agent error |
+| `AgentHalted` | `chimera_runtime.agent` | Agent has been halted (Art. 14) |
+| `PolicyError` | `chimera_runtime.policy` | Policy load/eval/verify error |
+| `PolicyFileNotFoundError` | `chimera_runtime.policy` | Policy file does not exist |
+| `PolicyVerificationError` | `chimera_runtime.policy` | Z3 verification failed |
+| `RuleEngineError` | `chimera_runtime.rules` | YAML rule engine error |
+| `RuleParseError` | `chimera_runtime.rules` | Expression parse error |
+| `ComplianceError` | `chimera_runtime.integrations.base` | Action blocked by policy |
+| `OversightError` | `chimera_runtime.oversight` | Oversight operation error |
+| `OversightTimeoutError` | `chimera_runtime.oversight` | Human confirmation timeout |
+| `ConfigError` | `chimera_runtime.config` | Config load/validate error |
+| `AuditStorageError` | `chimera_runtime.audit.storage` | Audit I/O error |
+| `LLMError` | `chimera_runtime.llm` | LLM provider error |
+| `LLMAuthenticationError` | `chimera_runtime.llm` | Invalid API key |
+| `LLMRateLimitError` | `chimera_runtime.llm` | Rate limit exceeded |
+| `LLMTimeoutError` | `chimera_runtime.llm` | LLM request timeout |
+| `LLMResponseParseError` | `chimera_runtime.llm` | Cannot parse LLM response |
+| `DocsGeneratorError` | `chimera_runtime.docs` | Documentation generation error |
 
 ---
 

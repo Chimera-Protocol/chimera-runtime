@@ -1,25 +1,25 @@
 # Quickstart
 
-Get chimera-compliance running in under 5 minutes.
+Get chimera-runtime running in under 5 minutes.
 
 ---
 
 ## Installation
 
 ```bash
-pip install chimera-compliance
+pip install chimera-runtime
 ```
 
 ## Initialize a Project
 
-chimera-compliance supports two modes:
+chimera-runtime supports two modes:
 
 ### Integration Mode (recommended for most teams)
 
 Use this when you already have an AI agent framework (LangChain, LangGraph, CrewAI, etc.) and want to add compliance.
 
 ```bash
-chimera-compliance init --mode integration
+chimera-runtime init --mode integration
 ```
 
 The wizard will ask you to:
@@ -37,10 +37,10 @@ audit_logs/              # Audit log directory
 
 ### Standalone Mode
 
-Use this when chimera-compliance manages the LLM directly (no external framework).
+Use this when chimera-runtime manages the LLM directly (no external framework).
 
 ```bash
-chimera-compliance init --mode standalone
+chimera-runtime init --mode standalone
 ```
 
 Additional prompts:
@@ -52,7 +52,7 @@ Additional prompts:
 ### Non-Interactive
 
 ```bash
-chimera-compliance init --non-interactive
+chimera-runtime init --non-interactive
 ```
 
 Uses defaults: standalone mode, YAML policy format, `./policies/starter.yaml`, `./audit_logs/`, 180-day retention.
@@ -62,7 +62,7 @@ Uses defaults: standalone mode, YAML policy format, `./policies/starter.yaml`, `
 ## Verify Your Setup
 
 ```bash
-chimera-compliance test --skip-llm
+chimera-runtime test --skip-llm
 ```
 
 This runs 8 validation steps:
@@ -105,13 +105,13 @@ rules:
 
 ```bash
 # Should be ALLOWED — Manager with $50,000
-chimera-compliance policy simulate policies/starter.yaml '{"amount": 50000, "role": "MANAGER"}'
+chimera-runtime policy simulate policies/starter.yaml '{"amount": 50000, "role": "MANAGER"}'
 
 # Should be BLOCKED — Manager with $500,000
-chimera-compliance policy simulate policies/starter.yaml '{"amount": 500000, "role": "MANAGER"}'
+chimera-runtime policy simulate policies/starter.yaml '{"amount": 500000, "role": "MANAGER"}'
 
 # Should be BLOCKED — Analyst with any amount
-chimera-compliance policy simulate policies/starter.yaml '{"amount": 100, "role": "ANALYST"}'
+chimera-runtime policy simulate policies/starter.yaml '{"amount": 100, "role": "ANALYST"}'
 ```
 
 ---
@@ -121,19 +121,19 @@ chimera-compliance policy simulate policies/starter.yaml '{"amount": 100, "role"
 ### LangChain
 
 ```bash
-pip install chimera-compliance[langchain]
+pip install chimera-runtime[langchain]
 ```
 
 ```python
 from langchain_core.tools import tool
-from chimera_compliance.integrations.langchain import wrap_tools
+from chimera_runtime.integrations.langchain import wrap_tools
 
 @tool
 def approve_budget(amount: int, department: str) -> str:
     """Approve a budget allocation."""
     return f"Approved ${amount} for {department}"
 
-# Wrap tools with compliance guard
+# Wrap tools with runtime guard
 guarded_tools = wrap_tools(
     tools=[approve_budget],
     policy="./policies/starter.yaml",
@@ -146,11 +146,11 @@ guarded_tools = wrap_tools(
 ### LangGraph
 
 ```bash
-pip install chimera-compliance[langgraph]
+pip install chimera-runtime[langgraph]
 ```
 
 ```python
-from chimera_compliance.integrations.langgraph import compliance_node, compliance_edge
+from chimera_runtime.integrations.langgraph import compliance_node, compliance_edge
 
 # Add a compliance gate node to your graph
 check = compliance_node(policy="./policies/starter.yaml")
@@ -164,11 +164,11 @@ graph.add_conditional_edges("compliance", route)
 ### CrewAI
 
 ```bash
-pip install chimera-compliance[crewai]
+pip install chimera-runtime[crewai]
 ```
 
 ```python
-from chimera_compliance.integrations.crewai import wrap_crew_tools
+from chimera_runtime.integrations.crewai import wrap_crew_tools
 
 guarded_tools = wrap_crew_tools(
     tools=[my_crew_tool],
@@ -179,11 +179,11 @@ guarded_tools = wrap_crew_tools(
 ### AutoGen
 
 ```bash
-pip install chimera-compliance[autogen]
+pip install chimera-runtime[autogen]
 ```
 
 ```python
-from chimera_compliance.integrations.autogen import guard_function_call
+from chimera_runtime.integrations.autogen import guard_function_call
 
 @guard_function_call(policy="./policies/starter.yaml")
 def transfer_funds(amount: int, destination: str) -> str:
@@ -194,13 +194,13 @@ def transfer_funds(amount: int, destination: str) -> str:
 
 ```bash
 export CHIMERA_API_KEY=sk-...
-chimera-compliance run
+chimera-runtime run
 ```
 
 Or programmatically:
 
 ```python
-from chimera_compliance import ChimeraAgent
+from chimera_runtime import ChimeraAgent
 
 agent = ChimeraAgent(
     model="gpt-4o",
@@ -225,16 +225,16 @@ print(result.audit)        # Full DecisionAuditRecord
 
 ```bash
 # Last 10 decisions
-chimera-compliance audit --last 10
+chimera-runtime audit --last 10
 
 # Only blocked decisions
-chimera-compliance audit --result BLOCKED
+chimera-runtime audit --result BLOCKED
 
 # Aggregate statistics
-chimera-compliance audit --stats
+chimera-runtime audit --stats
 
 # Generate Art. 86 explanation report
-chimera-compliance explain --id dec_abc123 --open
+chimera-runtime explain --id dec_abc123 --open
 ```
 
 ---

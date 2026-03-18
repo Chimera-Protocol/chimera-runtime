@@ -114,7 +114,7 @@ export default function LoginPage() {
 
         {/* Footer */}
         <p className="text-center text-[#52525b] text-xs mt-6">
-          chimera-compliance v3.0.0 — EU AI Act Compliance for AI Agents
+          chimera-runtime v3.0.0 — Deterministic Runtime for AI Agents
         </p>
       </div>
     </div>

@@ -1,4 +1,4 @@
-# Production override for compliance.chimera-protocol.com
+# Production override for runtime.chimera-protocol.com
 # Usage: docker compose -f docker-compose.yml -f docker-compose.prod.yml up --build -d
 
 services:
@@ -6,7 +6,7 @@ services:
     ports: []
     environment:
       - CHIMERA_SECRET_KEY=${CHIMERA_SECRET_KEY}
-      - CHIMERA_CORS_ORIGINS=https://compliance.chimera-protocol.com
+      - CHIMERA_CORS_ORIGINS=https://runtime.chimera-protocol.com
       - CHIMERA_LICENSE_PRIVATE_KEY=${CHIMERA_LICENSE_PRIVATE_KEY}
     networks:
       - web
@@ -16,7 +16,7 @@ services:
     ports: []
     build:
       args:
-        - NEXT_PUBLIC_API_URL=https://api-compliance.chimera-protocol.com/api/v1
+        - NEXT_PUBLIC_API_URL=https://api-runtime.chimera-protocol.com/api/v1
     networks:
       - web
       - default

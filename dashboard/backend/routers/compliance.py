@@ -12,9 +12,9 @@ from typing import Optional
 
 from fastapi import APIRouter, HTTPException, Query
 
-from chimera_compliance.audit.query import AuditQuery
-from chimera_compliance.audit.storage import load_all_records
-from chimera_compliance.policy import CSL_CORE_AVAILABLE
+from chimera_runtime.audit.query import AuditQuery
+from chimera_runtime.audit.storage import load_all_records
+from chimera_runtime.policy import CSL_CORE_AVAILABLE
 
 router = APIRouter(prefix="/compliance", tags=["compliance"])
 

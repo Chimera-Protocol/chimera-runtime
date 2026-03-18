@@ -1,7 +1,7 @@
 # EU AI Act — Annex IV Technical Documentation
 
-**System:** chimera-compliance v0.1.0
-**Generated:** 2026-03-07T13:42:44.885Z
+**System:** chimera-runtime v0.1.0
+**Generated:** 2026-03-17T03:24:22.838Z
 **Schema Version:** 1.0.0
 **Coverage:** 14/19 sections auto-filled
 
@@ -11,33 +11,33 @@
 
 **Article Reference:** Annex IV, Section 1
 
-chimera-compliance is a neuro-symbolic AI agent framework that combines large language
-model (LLM) reasoning with formal policy verification to produce auditable,
-compliant AI decisions.
+chimera-runtime is a neuro-symbolic AI compliance framework that combines large language model (LLM) reasoning with Z3 formal policy verification to produce auditable, compliant AI decisions.
 
 | Property | Value |
 |----------|-------|
-| System Name | chimera-compliance |
+| System Name | chimera-runtime |
 | Version | 0.1.0 |
 | CSL-Core Version | 0.3.0 |
-| Intended Purpose | AI decision-making with formal safety guarantees |
-| Risk Classification | High-risk (requires Annex IV documentation) |
-| Deployment Type | On-premise / Cloud API |
+| Policy Backend | CSL-Core (Chimera Specification Language) |
+| Deployment Mode | Standalone (manages LLM directly) |
 
 **Architecture:** Neural (LLM) → Symbolic (CSL Policy Engine + Z3) → Audit Pipeline
 
+
 The system operates by:
 1. Receiving natural language requests
-2. Generating candidate strategies via LLM
-3. Evaluating each candidate against formally verified policy constraints
+2. Generating candidate strategies via LLM (openai / gpt-4o)
+3. Evaluating each candidate against policy constraints (CSL-Core (Chimera Specification Language))
 4. Selecting the highest-confidence compliant candidate
 5. Producing a complete audit record for every decision
+
 
 ---
 
 ## Section 2 — Elements of the AI System and Development Process
 
 **Article Reference:** Annex IV, Section 2
+
 
 ### 2.1 LLM Component (Neural)
 
@@ -49,6 +49,7 @@ The system operates by:
 | Candidates per Attempt | 3 |
 | Max Retries | 3 |
 
+
 ### 2.2 Policy Engine (Symbolic)
 
 | Property | Value |
@@ -59,6 +60,10 @@ The system operates by:
 | Policy Hash | sha256:3a8dc2bdcec45c482094ba6dea5c57d72d3a11cff0990a6b7234364ccbb43a71 |
 | Auto-Verify on Startup | True |
 | Domain | GovernanceGuard |
+| Variables | 6 |
+| Constraints | 7 |
+| Verified | True |
+
 
 ### 2.3 Policy Variables
 
@@ -97,7 +102,7 @@ The system operates by:
 
 ### 3.1 Decision Pipeline Monitoring
 
-Every decision is monitored through the complete neuro→symbolic→audit pipeline:
+Every decision is monitored through the complete pipeline:
 
 - **LLM Generation:** Each candidate is tracked with strategy, reasoning, confidence
 - **Policy Evaluation:** Every candidate evaluated against all constraints; violations recorded
@@ -119,7 +124,7 @@ Every decision is monitored through the complete neuro→symbolic→audit pipeli
 - **Policy Hot-Reload:** True — policy changes take effect without restart
 - **Halt Mechanism:** `agent.halt()` immediately stops all decision-making (Art. 14)
 - **Resume:** `agent.resume()` reactivates after halt
-- **Consecutive Block Threshold:** 5 — auto-alerts after N consecutive blocks
+- **Consecutive Block Alert:** After 5 consecutive blocks
 
 ---
 
@@ -132,23 +137,28 @@ Every decision is monitored through the complete neuro→symbolic→audit pipeli
 
 | Metric | Value |
 |--------|-------|
-| Total Decisions | 9 |
-| Allowed | 7 (77.8%) |
-| Blocked | 2 (22.2%) |
+| Total Decisions | 24 |
+| Allowed | 15 (62.5%) |
+| Blocked | 9 (37.5%) |
 | Human Overrides | 0 |
 | Interrupted | 0 |
-| Avg Duration | 1745.2 ms |
-| Avg Candidates/Decision | 1.2 |
-| Avg Attempts/Decision | 1.2 |
-| Total Violations | 6 |
+| Avg Duration | 654.5 ms |
+| Avg Candidates/Decision | 1.4 |
+| Avg Attempts/Decision | 1.1 |
+| Total Violations | 22 |
 
 ### 4.2 Top Constraint Violations
 
 | Constraint | Occurrences |
 |------------|-------------|
+| single_channel_cap | 8 |
+| manager_approval_limit | 3 |
+| director_approval_limit | 2 |
+| analyst_no_spend | 2 |
 | amount_limit | 2 |
 | admin_required | 2 |
 | limit_large_transfers | 2 |
+| absolute_ceiling | 1 |
 
 
 
@@ -158,31 +168,37 @@ Every decision is monitored through the complete neuro→symbolic→audit pipeli
 
 **Article Reference:** Annex IV, Section 5
 
-### 5.1 Formal Verification
+
+### 5.1 Formal Verification (Z3)
 
 All policy constraints are formally verified using the Z3 SMT solver before deployment:
 
-- **Syntax Validation:** CSL parser validates grammar
-- **Semantic Validation:** Type checking, scope analysis
-- **Z3 Logic Verification:** Reachability, internal consistency, pairwise conflicts
-- **Mathematical Guarantee:** Policy constraints are provably consistent (SAT result)
+1. **Syntax Validation** — CSL parser validates grammar
+2. **Semantic Validation** — Type checking, scope analysis
+3. **Z3 Logic Verification** — Reachability, consistency, conflict detection
+4. **IR Compilation** — Generates runtime guard
+
+**Verification Status:** ✅ Policy verified — constraints are provably consistent
+
 
 ### 5.2 Risk Mitigation Through Policy Constraints
 
 The system mitigates risks through deterministic policy enforcement:
 
-- All LLM outputs are validated against formal constraints before execution
+- All LLM outputs are validated against policy constraints before execution
 - No action can bypass policy evaluation
 - Violations are recorded with full context for investigation
 
-- **6 violations** have been caught and prevented in the current period
+- **22 violations** have been caught and prevented in the current period
 
 
 ### 5.3 Adversarial Resilience (Art. 15)
 
-- LLM outputs are treated as **untrusted** — every candidate must pass formal verification
-- Policy constraints are deterministic and cannot be influenced by LLM prompt injection
-- The CSL policy engine operates independently of the neural component
+- LLM outputs are treated as **untrusted** — every candidate must pass policy verification
+- Policy constraints are deterministic and cannot be influenced by external inputs
+- The CSL-Core (Chimera Specification Language) operates independently of the neural component
+- Z3 proves policy consistency — no logical bypass possible
+
 
 ---
 
@@ -195,8 +211,8 @@ System changes are tracked through the audit pipeline:
 
 - **Policy Hash:** Each decision records the exact policy hash at decision time
 - **Current Policy Hash:** `sha256:3a8dc2bdcec45c482094ba6dea5c57d72d3a11cff0990a6b7234364ccbb43a71`
-- **Decision Count:** 9 decisions recorded
-- **Period:** 2026-02-26T07:41:35.946Z to 2026-03-05T00:05:20.081Z
+- **Decision Count:** 24 decisions recorded
+- **Period:** 2026-02-26T07:41:35.946Z to 2026-03-08T11:27:55.226Z
 
 All changes to policy files trigger re-verification via Z3.
 
@@ -245,19 +261,22 @@ All changes to policy files trigger re-verification via Z3.
 
 | Measure | Status |
 |---------|--------|
+| Active Mode | auto — Automatic approval — no human in the loop (override available) |
 | Confirmation Required | False |
 | Override Allowed | True |
 | Policy Human-Editable | Yes (CSL text files) |
 | Stop Mechanism | `agent.halt()` — immediate cessation |
 | Consecutive Block Alert | After 5 blocks |
 
-### 9.2 Oversight Modes
+### 9.2 Available Oversight Modes
 
 | Mode | Description |
 |------|-------------|
 | **Interactive** | Blocks on stdin; human must approve each decision |
 | **SDK/Callback** | Programmatic approval via callback function |
 | **Auto** | No human in loop (for batch/testing) |
+
+**Currently Active:** `auto`
 
 ### 9.3 Override Capabilities
 
@@ -279,8 +298,8 @@ of the DecisionAuditRecord.
 > Describe any pre-determined changes to the system that have been assessed
 > at the time of initial conformity assessment.
 >
-> For chimera-compliance, relevant changes include:
-> - Policy file updates (automatically re-verified)
+> Relevant change types for this system:
+> - Policy file updates (automatically re-verified via Z3)
 > - LLM model upgrades
 > - Configuration parameter adjustments
 
@@ -290,7 +309,8 @@ of the DecisionAuditRecord.
 
 **Article Reference:** Annex IV, Section 11
 
-### 11.1 Formal Verification
+
+### 11.1 Formal Verification (Z3)
 
 Every CSL policy undergoes four-stage verification before deployment:
 
@@ -299,22 +319,12 @@ Every CSL policy undergoes four-stage verification before deployment:
 3. **Z3 Logic Verification** — Reachability, consistency, conflicts
 4. **IR Compilation** — Generates runtime guard
 
+
 ### 11.2 Runtime Validation
 
 - Each candidate is evaluated against the compiled policy at runtime
 - Policy evaluation results include: ALLOWED / BLOCKED + violation details
 - All evaluations are recorded in the audit trail
-
-### 11.3 Test Coverage
-
-The system includes comprehensive automated tests:
-
-- **Models:** Serialization roundtrips, enum values, helper functions
-- **Config:** Load/save, env overrides, validation rules
-- **Policy:** Loading, evaluation, hot-reload, dry-run mode
-- **LLM:** Candidate parsing, prompt construction, provider factory
-- **Agent:** Full pipeline, retry logic, halt/resume, oversight integration
-- **Audit:** Storage, query, export, HTML reports, retention
 
 ---
 
@@ -326,14 +336,16 @@ The system includes comprehensive automated tests:
 
 - **LLM Output Sandboxing:** All LLM outputs pass through deterministic policy gate
 - **Formal Verification:** Z3 proves policy consistency — no logical bypass possible
-- **Input Validation:** Candidate parameters are type-checked against policy variable domains
+- **Input Validation:** Candidate parameters are validated against policy variable domains
 - **No Direct Execution:** LLM cannot execute actions; it only proposes candidates
+
 
 ### 12.2 Data Protection
 
 - **API Keys:** Never serialized to disk (excluded from config.to_dict())
 - **Audit Records:** Immutable after creation
 - **Retention Enforcement:** Automatic cleanup after 180 days
+
 
 ---
 
@@ -345,11 +357,26 @@ The system includes comprehensive automated tests:
 |-----------|---------------|
 | LLM Provider | openai |
 | LLM Model | gpt-4o |
-| Policy Engine | CSL-Core (local, Python) |
+| Policy Engine | CSL-Core (Chimera Specification Language) |
 | Formal Verifier | Z3 SMT Solver (local) |
 | Audit Storage | Local filesystem (./audit_logs) |
-| Runtime | Python 3.10+ |
-| Dependencies | chimera-core >= 0.3.0, z3-solver |
+| Runtime | Python 3.12.5 |
+| Platform | macOS-26.3-arm64-arm-64bit |
+
+### 13.1 Installed Dependencies
+
+| Package | Version |
+|---------|---------|
+| chimera-core | 0.3.0 |
+| click | 8.2.1 |
+| rich | 13.9.4 |
+| pyyaml | 6.0.1 |
+| jinja2 | 3.1.6 |
+| langchain-core | 1.2.14 |
+| langgraph | 1.0.9 |
+| openai | 2.21.0 |
+| anthropic | 0.79.0 |
+
 
 ---
 
@@ -359,12 +386,14 @@ The system includes comprehensive automated tests:
 
 ### 14.1 Decision Input Format
 
+
 Each decision receives:
 
 | Field | Type | Description |
 |-------|------|-------------|
 | `request` | string | Natural language request |
 | `context` | dict | Session context (role, user_id, etc.) |
+
 
 ### 14.2 Policy Variable Inputs
 
@@ -386,6 +415,7 @@ Candidates generate parameters that map to policy variables:
 
 **Article Reference:** Annex IV, Section 15
 
+
 ### 15.1 DecisionResult
 
 | Field | Type | Description |
@@ -395,6 +425,7 @@ Candidates generate parameters that map to policy variables:
 | `explanation` | string | Human-readable reasoning |
 | `parameters` | dict | Final action parameters |
 | `audit` | DecisionAuditRecord | Complete audit trail |
+
 
 ### 15.2 DecisionAuditRecord (Spec §2.1)
 
@@ -421,8 +452,9 @@ The audit pipeline provides continuous post-market monitoring:
 ### 16.2 Alerting
 
 - **Consecutive Block Counter:** Tracks sequential blocked decisions
-- **Threshold Alert:** Configurable at 5 consecutive blocks
+- **Threshold Alert:** Configured at 5 consecutive blocks
 - **Decision Counter:** Running total for utilization monitoring
+
 
 ---
 
@@ -433,10 +465,11 @@ The audit pipeline provides continuous post-market monitoring:
 
 All system changes are captured in the audit trail:
 
-- **Policy changes** are detected via hash comparison and trigger re-verification
+- **Policy changes** are detected via hash comparison and trigger re-verification via Z3
+
 - **Configuration changes** are reflected in the agent info section of each audit record
 - **Model changes** are captured in the agent info (model, provider, temperature)
-- **9 decisions** have been recorded to date
+- **24 decisions** have been recorded to date
 
 
 ---
@@ -447,11 +480,11 @@ All system changes are captured in the audit trail:
 
 > ⚠️ **MANUAL INPUT REQUIRED**
 >
-> Provide relevant information about the datasets used for training,
-> validation, and testing of the AI system.
->
 > Note: The LLM component is externally trained by openai.
 > Refer to the model provider's documentation for training data details.
+>
+> Provide relevant information about the datasets used for training,
+> validation, and testing of the AI system.
 
 ---
 
@@ -473,5 +506,5 @@ All system changes are captured in the audit trail:
 
 ---
 
-*Generated by chimera-compliance v0.1.0 — Annex IV Documentation Generator*
-*Template version: 1.0.0 | CSL-Core: 0.3.0*
+*Generated by chimera-runtime v0.1.0 — Annex IV Documentation Generator*
+*Policy backend: CSL-Core (Chimera Specification Language) | Python 3.12.5 | CSL-Core: 0.3.0*

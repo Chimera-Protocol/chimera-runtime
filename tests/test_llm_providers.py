@@ -1,11 +1,11 @@
 """
-Tests for chimera_compliance.llm
+Tests for chimera_runtime.llm
 
 Validates:
   - BaseLLMProvider candidate parsing from various JSON formats
   - System prompt construction with variable specs and rejection context
   - Provider factory returns correct provider types
-  - Each provider wraps errors into chimera-compliance error types
+  - Each provider wraps errors into chimera-runtime error types
   - MockProvider can simulate full generate_candidates flow
   - build_variable_spec formats correctly
 """
@@ -15,7 +15,7 @@ import importlib
 import pytest
 from typing import Any, Dict, List, Optional
 
-from chimera_compliance.llm import (
+from chimera_runtime.llm import (
     get_provider,
     BaseLLMProvider,
     LLMError,
@@ -25,7 +25,7 @@ from chimera_compliance.llm import (
     LLMResponseParseError,
     build_variable_spec,
 )
-from chimera_compliance.models import Candidate
+from chimera_runtime.models import Candidate
 
 
 # ============================================================================

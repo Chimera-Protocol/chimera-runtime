@@ -54,14 +54,14 @@ const pipelineSteps = [
   {
     id: 4,
     title: "Decision",
-    subtitle: "Compliance guard makes final decision",
+    subtitle: "Runtime guard makes final decision",
     icon: Shield,
     color: "#ef4444",
   },
   {
     id: 5,
     title: "Audit Record",
-    subtitle: "Immutable compliance record generated",
+    subtitle: "Immutable audit record generated",
     icon: FileText,
     color: "#22c55e",
   },
@@ -257,7 +257,7 @@ export default function DemoPage() {
             Interactive Demo
           </h1>
           <p className="text-[#71717a] max-w-2xl mx-auto">
-            Explore how Chimera Compliance works — from pipeline flow to dashboard features.
+            Explore how Chimera Runtime works — from pipeline flow to dashboard features.
           </p>
         </div>
 
@@ -517,7 +517,7 @@ export default function DemoPage() {
               <div className="rounded-xl border border-[#1e1e2e] bg-[#111119] p-5">
                 <h3 className="text-sm font-medium text-white mb-3 flex items-center gap-2">
                   <Shield className="h-4 w-4 text-[#22c55e]" />
-                  EU AI Act Compliance
+                  EU AI Act Enforcement
                 </h3>
                 <div className="space-y-2">
                   {[
@@ -538,7 +538,7 @@ export default function DemoPage() {
                   ))}
                 </div>
                 <div className="mt-3 flex items-center justify-between rounded-lg border border-[#22c55e]/20 bg-[#22c55e]/5 px-3 py-2">
-                  <span className="text-xs text-[#22c55e]">Compliance Score</span>
+                  <span className="text-xs text-[#22c55e]">Enforcement Score</span>
                   <span className="text-sm font-bold text-[#22c55e]">6/6</span>
                 </div>
               </div>
@@ -566,7 +566,7 @@ export default function DemoPage() {
             <div className="flex items-start gap-2 rounded-lg border border-[#818cf8]/20 bg-[#818cf8]/5 px-4 py-3">
               <Info className="h-4 w-4 text-[#818cf8] mt-0.5 shrink-0" />
               <p className="text-xs text-[#818cf8]/80 leading-relaxed">
-                Free tier includes decision log (last 7 days, 100 records), compliance flags, single policy viewer, and full unlimited local CLI usage. Upgrade to Pro for analytics, reasoning traces, simulation, and multi-agent management.
+                Free tier includes decision log (last 7 days, 100 records), enforcement flags, single policy viewer, and full unlimited local CLI usage. Upgrade to Pro for analytics, reasoning traces, simulation, and multi-agent management.
               </p>
             </div>
           </div>

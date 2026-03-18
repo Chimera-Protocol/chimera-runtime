@@ -1,11 +1,11 @@
 """
-Chimera Compliance Dashboard — FastAPI Backend
+Chimera Runtime Dashboard — FastAPI Backend
 
 Usage:
-    cd chimera-compliance
+    cd chimera-runtime
     uvicorn dashboard.backend.main:app --reload --port 8000
 
-The backend directly imports chimera_compliance modules — zero adapter layer.
+The backend directly imports chimera_runtime modules — zero adapter layer.
 All audit data comes from the existing JSON file-based storage in audit_logs/.
 """
 
@@ -26,7 +26,7 @@ from .models.api_key import create_api_keys_table
 from .middleware.auth import init_auth_middleware
 
 
-# Ensure the project root is on sys.path so chimera_compliance is importable
+# Ensure the project root is on sys.path so chimera_runtime is importable
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
@@ -82,8 +82,8 @@ async def lifespan(app: FastAPI):
 # ============================================================================
 
 app = FastAPI(
-    title="Chimera Compliance Dashboard",
-    description="EU AI Act compliance monitoring dashboard for AI agents",
+    title="Chimera Runtime Dashboard",
+    description="Runtime monitoring dashboard for AI agent policy enforcement and audit",
     version="1.0.0",
     lifespan=lifespan,
     docs_url="/docs",
@@ -122,7 +122,7 @@ async def health():
     """Health check endpoint."""
     return {
         "status": "ok",
-        "service": "chimera-compliance-dashboard",
+        "service": "chimera-runtime-dashboard",
         "version": "1.0.0",
     }
 

@@ -1,5 +1,5 @@
 """
-Audit Service — wraps chimera_compliance.audit for the dashboard API.
+Audit Service — wraps chimera_runtime.audit for the dashboard API.
 
 All data comes from the existing JSON file-based audit storage.
 The Python lib remains unlimited; tier limits are applied here (cloud dashboard only).
@@ -11,14 +11,14 @@ import math
 from datetime import datetime, timezone, timedelta
 from typing import Any, Dict, List, Optional, Tuple
 
-from chimera_compliance.audit.query import AuditQuery, AuditStats
-from chimera_compliance.audit.storage import load_record, load_all_records
-from chimera_compliance.audit.html_report import generate_html
-from chimera_compliance.models import DecisionAuditRecord
+from chimera_runtime.audit.query import AuditQuery, AuditStats
+from chimera_runtime.audit.storage import load_record, load_all_records
+from chimera_runtime.audit.html_report import generate_html
+from chimera_runtime.models import DecisionAuditRecord
 
 
 # Tier-based limits for the cloud dashboard UI only.
-# The local Python lib (pip install chimera-compliance) is NEVER limited.
+# The local Python lib (pip install chimera-runtime) is NEVER limited.
 TIER_LIMITS = {
     "free": {"max_days": 7, "max_records": 100, "full_detail": False},
     "pro": {"max_days": 90, "max_records": 10000, "full_detail": True},

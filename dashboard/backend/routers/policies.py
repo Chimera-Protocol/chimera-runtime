@@ -1,7 +1,7 @@
 """
 Policies API Router — /api/v1/policies/*
 
-Wraps chimera_compliance's PolicyManager for the dashboard.
+Wraps chimera_runtime's PolicyManager for the dashboard.
 """
 
 from __future__ import annotations

@@ -1,5 +1,5 @@
 """
-Tests for chimera_compliance.rules — YAML Rule Engine
+Tests for chimera_runtime.rules — YAML Rule Engine
 
 Tests the lightweight policy evaluation engine that works without CSL-Core.
 """
@@ -8,7 +8,7 @@ import pytest
 import yaml
 from pathlib import Path
 
-from chimera_compliance.rules import (
+from chimera_runtime.rules import (
     YAMLRuleEngine,
     RuleEngineError,
     RuleParseError,
@@ -277,36 +277,36 @@ class TestPolicyManagerYAML:
     """Test PolicyManager when using YAML backend."""
 
     def test_load_yaml(self, governance_yaml):
-        from chimera_compliance.policy import PolicyManager
+        from chimera_runtime.policy import PolicyManager
         pm = PolicyManager(governance_yaml)
         assert pm.backend == "yaml-rule-engine"
         assert pm.domain_name == "GovernanceGuard"
 
     def test_evaluate_yaml(self, governance_yaml):
-        from chimera_compliance.policy import PolicyManager
+        from chimera_runtime.policy import PolicyManager
         pm = PolicyManager(governance_yaml)
         result = pm.evaluate({"amount": 50000, "role": "MANAGER"})
         assert result.result == "ALLOWED"
 
     def test_evaluate_yaml_blocked(self, governance_yaml):
-        from chimera_compliance.policy import PolicyManager
+        from chimera_runtime.policy import PolicyManager
         pm = PolicyManager(governance_yaml)
         result = pm.evaluate({"amount": 300000, "role": "MANAGER"})
         assert result.result == "BLOCKED"
 
     def test_verify_yaml(self, governance_yaml):
-        from chimera_compliance.policy import PolicyManager
+        from chimera_runtime.policy import PolicyManager
         pm = PolicyManager(governance_yaml)
         ok, msgs = pm.verify()
         assert ok is True
 
     def test_constraint_names_yaml(self, governance_yaml):
-        from chimera_compliance.policy import PolicyManager
+        from chimera_runtime.policy import PolicyManager
         pm = PolicyManager(governance_yaml)
         assert "analyst_no_spend" in pm.constraint_names
 
     def test_unsupported_extension(self, tmp_path):
-        from chimera_compliance.policy import PolicyManager, PolicyError
+        from chimera_runtime.policy import PolicyManager, PolicyError
         p = tmp_path / "bad.txt"
         p.write_text("hello", encoding="utf-8")
         with pytest.raises(PolicyError, match="Unsupported"):

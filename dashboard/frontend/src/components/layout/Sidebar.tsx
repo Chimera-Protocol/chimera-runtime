@@ -51,7 +51,7 @@ const navItems: NavItem[] = [
     tier: "pro",
   },
   {
-    label: "Compliance",
+    label: "Enforcement",
     href: "/compliance",
     icon: Shield,
     tier: "enterprise",

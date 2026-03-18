@@ -55,9 +55,9 @@ function generateCode(
 
   switch (framework) {
     case "langchain":
-      return `from chimera_compliance.integrations.langchain import wrap_tools
+      return `from chimera_runtime.integrations.langchain import wrap_tools
 
-# Wrap your existing tools with compliance guard
+# Wrap your existing tools with runtime guard
 guarded_tools = wrap_tools(
     tools=[${agentName || "your_tool"}],
     policy="./policies/${policyFile}",${mappingStr}
@@ -67,9 +67,9 @@ guarded_tools = wrap_tools(
 # agent = create_react_agent(llm, guarded_tools, ...)`;
 
     case "langgraph":
-      return `from chimera_compliance.integrations.langgraph import compliance_node, compliance_edge
+      return `from chimera_runtime.integrations.langgraph import compliance_node, compliance_edge
 
-# Create compliance check node
+# Create enforcement check node
 check = compliance_node(
     policy="./policies/${policyFile}",${mappingStr}
 )
@@ -81,7 +81,7 @@ graph.add_edge("agent", "compliance")
 graph.add_conditional_edges("compliance", route)`;
 
     case "crewai":
-      return `from chimera_compliance.integrations.crewai import wrap_crew_tools
+      return `from chimera_runtime.integrations.crewai import wrap_crew_tools
 
 # Wrap your CrewAI tools
 guarded_tools = wrap_crew_tools(
@@ -93,7 +93,7 @@ guarded_tools = wrap_crew_tools(
 # crew = Crew(agents=[agent], tasks=[task], tools=guarded_tools)`;
 
     case "llamaindex":
-      return `from chimera_compliance.integrations.llamaindex import wrap_tools
+      return `from chimera_runtime.integrations.llamaindex import wrap_tools
 
 # Wrap your LlamaIndex tools
 guarded_tools = wrap_tools(
@@ -105,9 +105,9 @@ guarded_tools = wrap_tools(
 # agent = ReActAgent.from_tools(guarded_tools, llm=llm)`;
 
     case "autogen":
-      return `from chimera_compliance.integrations.autogen import guard_function_call
+      return `from chimera_runtime.integrations.autogen import guard_function_call
 
-# Decorator: wrap any function with compliance guard
+# Decorator: wrap any function with runtime guard
 @guard_function_call(
     policy="./policies/${policyFile}",${mappingStr}
 )
@@ -163,8 +163,8 @@ export default function ConnectAgentPage() {
 
   const fw = FRAMEWORKS.find((f) => f.id === selectedFramework);
   const installCmd = fw
-    ? `pip install chimera-compliance[${fw.installExtra}]`
-    : "pip install chimera-compliance";
+    ? `pip install chimera-runtime[${fw.installExtra}]`
+    : "pip install chimera-runtime";
 
   const handleCopy = async (text: string, setter: (v: boolean) => void) => {
     await navigator.clipboard.writeText(text);
@@ -188,7 +188,7 @@ export default function ConnectAgentPage() {
       <div>
         <h1 className="text-2xl font-bold text-white">Connect Agent</h1>
         <p className="mt-1 text-sm text-[#71717a]">
-          Add compliance guard to your AI agent in 4 steps
+          Add runtime guard to your AI agent in 4 steps
         </p>
       </div>
 
@@ -246,7 +246,7 @@ export default function ConnectAgentPage() {
                   <span className="text-2xl">{f.logo}</span>
                   <div>
                     <p className="text-sm font-medium text-white">{f.name}</p>
-                    <p className="text-[11px] text-[#71717a]">chimera-compliance[{f.installExtra}]</p>
+                    <p className="text-[11px] text-[#71717a]">chimera-runtime[{f.installExtra}]</p>
                   </div>
                 </button>
               ))}
@@ -285,7 +285,7 @@ export default function ConnectAgentPage() {
           <div>
             <h2 className="text-lg font-semibold text-white mb-1">Choose a policy</h2>
             <p className="text-sm text-[#71717a] mb-6">
-              Select the compliance policy your agent will be governed by
+              Select the enforcement policy your agent will be governed by
             </p>
 
             {policiesLoading ? (
@@ -369,7 +369,7 @@ export default function ConnectAgentPage() {
             <div className="mb-4 flex items-start gap-2 rounded-lg border border-[#6366f1]/20 bg-[#6366f1]/5 px-3 py-2">
               <AlertCircle className="h-3.5 w-3.5 text-[#818cf8] mt-0.5 shrink-0" />
               <p className="text-[11px] text-[#818cf8]/80 leading-relaxed">
-                If your tool&apos;s keyword arguments already match the policy variable names (e.g. your function takes <code className="bg-[#6366f1]/10 px-1 rounded">amount</code> and the policy uses <code className="bg-[#6366f1]/10 px-1 rounded">amount</code>), you can skip this step — chimera-compliance will auto-detect them.
+                If your tool&apos;s keyword arguments already match the policy variable names (e.g. your function takes <code className="bg-[#6366f1]/10 px-1 rounded">amount</code> and the policy uses <code className="bg-[#6366f1]/10 px-1 rounded">amount</code>), you can skip this step — chimera-runtime will auto-detect them.
               </p>
             </div>
 

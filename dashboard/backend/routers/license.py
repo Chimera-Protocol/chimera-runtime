@@ -2,7 +2,7 @@
 License Key Router — Issue signed JWT license keys for the SDK.
 
 Pro and Enterprise users can generate license keys for the
-chimera-compliance Python package. The key unlocks tier-gated features.
+chimera-runtime Python package. The key unlocks tier-gated features.
 """
 
 from __future__ import annotations
@@ -30,12 +30,12 @@ class LicenseKeyResponse(BaseModel):
 async def generate_sdk_key(
     user: dict = Depends(get_current_user),
 ):
-    """Generate a signed JWT license key for the chimera-compliance SDK.
+    """Generate a signed JWT license key for the chimera-runtime SDK.
 
     The key is valid for 1 year and can be used with:
       - Environment variable: CHIMERA_LICENSE_KEY=<key>
-      - CLI: chimera-compliance license activate <key>
-      - Python: chimera_compliance.activate_license("<key>")
+      - CLI: chimera-runtime license activate <key>
+      - Python: chimera_runtime.activate_license("<key>")
     """
     from ..services.license_service import generate_license_key
 
@@ -54,6 +54,6 @@ async def generate_sdk_key(
         email=user["email"],
         message=(
             f"License key generated for {user['tier'].upper()} tier. "
-            f"Activate with: chimera-compliance license activate <key>"
+            f"Activate with: chimera-runtime license activate <key>"
         ),
     )

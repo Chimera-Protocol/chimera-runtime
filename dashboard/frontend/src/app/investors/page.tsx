@@ -30,7 +30,7 @@ const milestones = [
 const marketStats = [
   { value: "$2.1T", label: "AI market by 2030", sub: "McKinsey" },
   { value: "Aug 2025", label: "EU AI Act enforcement", sub: "Article 6" },
-  { value: "€35M", label: "Max non-compliance fine", sub: "Per violation" },
+  { value: "€35M", label: "Max non-enforcement fine", sub: "Per violation" },
   { value: "0", label: "Competitors with formal verification", sub: "We're first" },
 ];
 
@@ -47,7 +47,7 @@ export default function InvestorsPage() {
           <Link href="/" className="flex items-center gap-2">
             <Shield className="h-6 w-6 text-[#6366f1]" />
             <span className="text-lg font-bold text-white">
-              Chimera<span className="text-[#6366f1]">Compliance</span>
+              Chimera<span className="text-[#6366f1]">Runtime</span>
             </span>
           </Link>
           <Link
@@ -67,14 +67,14 @@ export default function InvestorsPage() {
             <span className="text-xs font-medium text-[#818cf8]">Actively Raising</span>
           </div>
           <h1 className="text-4xl sm:text-5xl font-bold text-white leading-tight">
-            The Compliance Layer for
+            The Deterministic Runtime for
             <br />
             <span className="bg-gradient-to-r from-[#6366f1] to-[#22c55e] bg-clip-text text-transparent">
               the AI Economy
             </span>
           </h1>
           <p className="mt-6 text-lg text-[#a1a1aa] max-w-2xl mx-auto leading-relaxed">
-            Every AI agent will need a compliance guard. We&apos;re building the infrastructure
+            Every AI agent will need a deterministic runtime. We&apos;re building the infrastructure
             that makes AI decisions provably safe, auditable, and regulation-ready.
           </p>
         </div>
@@ -109,8 +109,8 @@ export default function InvestorsPage() {
               non-compliance. Yet no existing tool offers{" "}
               <span className="text-white font-medium">formal mathematical verification</span>{" "}
               of AI decisions — they rely on heuristic guardrails that can be bypassed.
-              Chimera Compliance is the first system to make every AI decision{" "}
-              <span className="text-[#6366f1] font-medium">provably compliant</span>.
+              Chimera Runtime is the first system to make every AI decision{" "}
+              <span className="text-[#6366f1] font-medium">provably enforced</span>.
             </p>
           </div>
         </section>
@@ -129,7 +129,7 @@ export default function InvestorsPage() {
               {
                 icon: Brain,
                 title: "Neuro-Symbolic Architecture",
-                desc: "Not just guardrails — a formal verification engine (Z3 SAT solver) that mathematically proves every AI decision is policy-compliant. Published research backing.",
+                desc: "Not just guardrails — a formal verification engine (Z3 SAT solver) that mathematically proves every AI decision is policy-enforced. Published research backing.",
                 color: "#6366f1",
               },
               {
@@ -141,7 +141,7 @@ export default function InvestorsPage() {
               {
                 icon: Layers,
                 title: "Framework-Agnostic Runtime",
-                desc: "Drop-in integration with LangChain, LangGraph, CrewAI, LlamaIndex, AutoGen. One line of code wraps any AI agent with compliance enforcement.",
+                desc: "Drop-in integration with LangChain, LangGraph, CrewAI, LlamaIndex, AutoGen. One line of code wraps any AI agent with deterministic enforcement.",
                 color: "#22c55e",
               },
               {
@@ -315,10 +315,10 @@ export default function InvestorsPage() {
             <p className="text-sm text-[#a1a1aa] mb-8 max-w-md mx-auto">
               We&apos;re raising our pre-seed round to accelerate product development,
               onboard enterprise pilots, and expand the team. Interested in the
-              future of AI compliance infrastructure?
+              future of AI runtime infrastructure?
             </p>
             <a
-              href="mailto:akarlaraytu@gmail.com?subject=Chimera%20Compliance%20—%20Investor%20Inquiry"
+              href="mailto:akarlaraytu@gmail.com?subject=Chimera%20Runtime%20—%20Investor%20Inquiry"
               className="inline-flex items-center gap-2 rounded-xl bg-[#6366f1] hover:bg-[#5558e6] text-white font-medium px-8 py-3.5 transition shadow-lg shadow-[#6366f1]/20"
             >
               <Mail className="h-4 w-4" />
@@ -334,7 +334,7 @@ export default function InvestorsPage() {
         <div className="mt-16 pt-8 border-t border-[#1e1e2e] flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Shield className="h-4 w-4 text-[#6366f1]" />
-            <span className="text-xs text-[#71717a]">Chimera Compliance v3.0.0</span>
+            <span className="text-xs text-[#71717a]">Chimera Runtime v3.0.0</span>
           </div>
           <div className="flex items-center gap-4">
             <Link href="/demo" className="text-xs text-[#71717a] hover:text-white transition flex items-center gap-1">

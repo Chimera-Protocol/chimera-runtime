@@ -1,10 +1,10 @@
 # Policy Guide
 
-How to write compliance policies for chimera-compliance.
+How to write compliance policies for chimera-runtime.
 
-chimera-compliance supports two policy formats:
+chimera-runtime supports two policy formats:
 - **YAML rules** (built-in, no extra dependencies)
-- **CSL policies** (optional, requires `pip install chimera-compliance[csl]`)
+- **CSL policies** (optional, requires `pip install chimera-runtime[csl]`)
 
 Both formats produce the same `PolicyEvaluation` result and can be used interchangeably with any integration.
 
@@ -76,7 +76,7 @@ The `when` field uses a safe expression evaluator (AST-based, no `eval()`).
 
 ### Variable Declarations
 
-The `variables` section documents what variables your rules use. This is used by the `chimera-compliance test` command to generate sample inputs.
+The `variables` section documents what variables your rules use. This is used by the `chimera-runtime test` command to generate sample inputs.
 
 ```yaml
 variables:
@@ -152,7 +152,7 @@ rules:
 CSL (Constraint Specification Language) provides mathematically provable policy enforcement via Z3 formal verification.
 
 ```bash
-pip install chimera-compliance[csl]
+pip install chimera-runtime[csl]
 ```
 
 ### Structure
@@ -254,10 +254,10 @@ This ensures:
 - No two constraints contradict each other
 - The policy is internally consistent
 
-Use `chimera-compliance verify` to run verification manually:
+Use `chimera-runtime verify` to run verification manually:
 
 ```bash
-chimera-compliance verify policies/governance.csl
+chimera-runtime verify policies/governance.csl
 ```
 
 ---
@@ -284,19 +284,19 @@ chimera-compliance verify policies/governance.csl
 
 ```bash
 # Single test case
-chimera-compliance policy simulate policies/governance.yaml '{"amount": 50000, "role": "MANAGER"}'
+chimera-runtime policy simulate policies/governance.yaml '{"amount": 50000, "role": "MANAGER"}'
 
 # Multiple test cases from file
-chimera-compliance policy simulate policies/governance.yaml --input test_cases.json
+chimera-runtime policy simulate policies/governance.yaml --input test_cases.json
 
 # Dry run (evaluates but never blocks)
-chimera-compliance policy simulate policies/governance.yaml '{"amount": 999999}' --dry-run
+chimera-runtime policy simulate policies/governance.yaml '{"amount": 999999}' --dry-run
 ```
 
 ### Programmatic Testing
 
 ```python
-from chimera_compliance import PolicyManager
+from chimera_runtime import PolicyManager
 
 pm = PolicyManager("./policies/governance.yaml")
 
@@ -326,7 +326,7 @@ Create `test_cases.json`:
 ```
 
 ```bash
-chimera-compliance policy simulate policies/governance.yaml --input test_cases.json
+chimera-runtime policy simulate policies/governance.yaml --input test_cases.json
 ```
 
 ---
@@ -364,10 +364,10 @@ Evaluate policies without blocking. Useful for shadow testing a new policy in pr
 
 ```bash
 # CLI
-chimera-compliance policy simulate policies/new_policy.yaml '{"amount": 999999}' --dry-run
+chimera-runtime policy simulate policies/new_policy.yaml '{"amount": 999999}' --dry-run
 
 # Or via agent
-chimera-compliance run --dry-run
+chimera-runtime run --dry-run
 ```
 
 ```python

@@ -113,7 +113,7 @@ function ContactPageInner() {
           <div>
             <p className="text-sm font-medium text-[#f59e0b]">Under Active Development</p>
             <p className="text-xs text-[#f59e0b]/70 mt-1">
-              Chimera Compliance is currently in active development. Leave your details and our team will reach out when your plan is ready.
+              Chimera Runtime is currently in active development. Leave your details and our team will reach out when your plan is ready.
             </p>
           </div>
         </div>
@@ -262,7 +262,7 @@ function ContactPageInner() {
 
         {/* Footer note */}
         <p className="text-center text-[10px] text-[#52525b] mt-6">
-          chimera-compliance v3.0.0 — Under active development
+          chimera-runtime v3.0.0 — Under active development
         </p>
       </div>
     </div>

@@ -1,5 +1,5 @@
 """
-Policy Service — wraps chimera_compliance.policy.PolicyManager for the dashboard.
+Policy Service — wraps chimera_runtime.policy.PolicyManager for the dashboard.
 """
 
 from __future__ import annotations
@@ -8,7 +8,7 @@ import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from chimera_compliance.policy import PolicyManager, PolicyError, CSL_CORE_AVAILABLE
+from chimera_runtime.policy import PolicyManager, PolicyError, CSL_CORE_AVAILABLE
 
 
 class PolicyService:

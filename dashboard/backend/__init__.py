@@ -1,1 +1,1 @@
-"""Chimera Compliance Dashboard — FastAPI Backend"""
+"""Chimera Runtime Dashboard — FastAPI Backend"""

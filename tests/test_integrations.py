@@ -1,5 +1,5 @@
 """
-Tests for chimera_compliance.integrations
+Tests for chimera_runtime.integrations
 
 Tests the core ComplianceGuard and integration base classes.
 Framework-specific tests (LangChain, etc.) are skipped if the framework is not installed.
@@ -9,9 +9,9 @@ import pytest
 import yaml
 from pathlib import Path
 
-from chimera_compliance.integrations import ComplianceGuard
-from chimera_compliance.integrations.base import ComplianceError, ActionGuardMixin
-from chimera_compliance.integrations.autogen import guard_function_call
+from chimera_runtime.integrations import ComplianceGuard
+from chimera_runtime.integrations.base import ComplianceError, ActionGuardMixin
+from chimera_runtime.integrations.autogen import guard_function_call
 
 
 # ============================================================================

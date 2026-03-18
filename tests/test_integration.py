@@ -1,5 +1,5 @@
 """
-Full Integration Tests for chimera-compliance v2.0
+Full Integration Tests for chimera-runtime v2.0
 
 End-to-end flows testing the complete lifecycle:
   init → config → verify → simulate → decide → audit → explain → docs
@@ -116,7 +116,7 @@ def runner():
 
 def _mock_llm_response(candidates_data: list[dict]):
     """Create a mock LLM provider that returns specified candidates."""
-    from chimera_compliance.models import Candidate, generate_candidate_id
+    from chimera_runtime.models import Candidate, generate_candidate_id
 
     mock_provider = MagicMock()
 
@@ -147,8 +147,8 @@ class TestLifecycleSetup:
     """Phase 1: Project initialization and configuration."""
 
     def test_init_creates_project(self, runner, tmp_path):
-        """chimera-compliance init creates config and starter policy."""
-        from chimera_compliance.cli.main import cli
+        """chimera-runtime init creates config and starter policy."""
+        from chimera_runtime.cli.main import cli
 
         config_path = str(tmp_path / ".chimera" / "config.yaml")
         result = runner.invoke(cli, [
@@ -160,7 +160,7 @@ class TestLifecycleSetup:
 
     def test_config_loads_correctly(self, config_yaml):
         """Config YAML round-trips through load/save."""
-        from chimera_compliance import load_config, save_config
+        from chimera_runtime import load_config, save_config
 
         config = load_config(config_yaml)
         assert config.llm.provider == "openai"
@@ -176,7 +176,7 @@ class TestLifecycleSetup:
 
     def test_policy_verifies(self, project_dir):
         """Governance policy passes full Z3 verification."""
-        from chimera_compliance import PolicyManager
+        from chimera_runtime import PolicyManager
 
         pm = PolicyManager(
             str(project_dir / "policies" / "governance.csl"),
@@ -189,7 +189,7 @@ class TestLifecycleSetup:
 
     def test_verify_cli_command(self, runner, project_dir, config_yaml):
         """CLI verify command works end-to-end."""
-        from chimera_compliance.cli.main import cli
+        from chimera_runtime.cli.main import cli
 
         result = runner.invoke(cli, [
             "--config", config_yaml,
@@ -210,7 +210,7 @@ class TestPolicySimulation:
 
     def test_allowed_within_limits(self, project_dir):
         """MANAGER with 200k should be ALLOWED."""
-        from chimera_compliance import PolicyManager
+        from chimera_runtime import PolicyManager
 
         pm = PolicyManager(str(project_dir / "policies" / "governance.csl"))
         result = pm.evaluate({
@@ -226,7 +226,7 @@ class TestPolicySimulation:
 
     def test_blocked_exceeds_limit(self, project_dir):
         """MANAGER with 500k should be BLOCKED."""
-        from chimera_compliance import PolicyManager
+        from chimera_runtime import PolicyManager
 
         pm = PolicyManager(str(project_dir / "policies" / "governance.csl"))
         result = pm.evaluate({
@@ -242,7 +242,7 @@ class TestPolicySimulation:
 
     def test_simulate_cli_allowed(self, runner, project_dir, config_yaml):
         """CLI simulate shows ALLOWED for valid input."""
-        from chimera_compliance.cli.main import cli
+        from chimera_runtime.cli.main import cli
 
         context = json.dumps({
             "amount": 100000, "role": "MANAGER", "channel": "DIGITAL",
@@ -259,7 +259,7 @@ class TestPolicySimulation:
 
     def test_simulate_cli_blocked(self, runner, project_dir, config_yaml):
         """CLI simulate shows BLOCKED with violations."""
-        from chimera_compliance.cli.main import cli
+        from chimera_runtime.cli.main import cli
 
         context = json.dumps({
             "amount": 500000, "role": "MANAGER", "channel": "DIGITAL",
@@ -276,7 +276,7 @@ class TestPolicySimulation:
 
     def test_dry_run_never_blocks(self, project_dir):
         """Dry-run mode evaluates but always returns ALLOWED."""
-        from chimera_compliance import PolicyManager
+        from chimera_runtime import PolicyManager
 
         pm = PolicyManager(
             str(project_dir / "policies" / "governance.csl"),
@@ -302,7 +302,7 @@ class TestAgentDecide:
 
     def test_decide_allowed(self, project_dir, config_yaml):
         """Agent.decide() produces ALLOWED result for compliant candidate."""
-        from chimera_compliance import ChimeraAgent, load_config
+        from chimera_runtime import ChimeraAgent, load_config
 
         config = load_config(config_yaml)
         mock_provider = _mock_llm_response([
@@ -318,7 +318,7 @@ class TestAgentDecide:
             },
         ])
 
-        with patch("chimera_compliance.agent.get_provider", return_value=mock_provider):
+        with patch("chimera_runtime.agent.get_provider", return_value=mock_provider):
             agent = ChimeraAgent.from_config(config, config_path=config_yaml)
             result = agent.decide("Increase marketing spend by $200k")
 
@@ -329,7 +329,7 @@ class TestAgentDecide:
 
     def test_decide_blocked_all_candidates(self, project_dir, config_yaml):
         """Agent.decide() returns BLOCKED when all candidates violate policy."""
-        from chimera_compliance import ChimeraAgent, load_config
+        from chimera_runtime import ChimeraAgent, load_config
 
         config = load_config(config_yaml)
         # All candidates exceed limits
@@ -346,7 +346,7 @@ class TestAgentDecide:
             }},
         ])
 
-        with patch("chimera_compliance.agent.get_provider", return_value=mock_provider):
+        with patch("chimera_runtime.agent.get_provider", return_value=mock_provider):
             agent = ChimeraAgent.from_config(config, config_path=config_yaml)
             result = agent.decide("Spend everything")
 
@@ -356,7 +356,7 @@ class TestAgentDecide:
 
     def test_decide_creates_audit_file(self, project_dir, config_yaml):
         """Every decide() creates a JSON audit file on disk."""
-        from chimera_compliance import ChimeraAgent, load_config
+        from chimera_runtime import ChimeraAgent, load_config
 
         config = load_config(config_yaml)
         mock_provider = _mock_llm_response([
@@ -367,7 +367,7 @@ class TestAgentDecide:
             }},
         ])
 
-        with patch("chimera_compliance.agent.get_provider", return_value=mock_provider):
+        with patch("chimera_runtime.agent.get_provider", return_value=mock_provider):
             agent = ChimeraAgent.from_config(config, config_path=config_yaml)
             result = agent.decide("Approve engineering budget")
 
@@ -382,7 +382,7 @@ class TestAgentDecide:
 
     def test_halt_and_resume(self, project_dir, config_yaml):
         """Agent halt/resume lifecycle works correctly."""
-        from chimera_compliance import ChimeraAgent, AgentHalted, load_config
+        from chimera_runtime import ChimeraAgent, AgentHalted, load_config
 
         config = load_config(config_yaml)
         mock_provider = _mock_llm_response([{"strategy": "x", "parameters": {
@@ -390,7 +390,7 @@ class TestAgentDecide:
             "is_weekend": "NO", "urgency": "LOW", "department": "MARKETING",
         }}])
 
-        with patch("chimera_compliance.agent.get_provider", return_value=mock_provider):
+        with patch("chimera_runtime.agent.get_provider", return_value=mock_provider):
             agent = ChimeraAgent.from_config(config, config_path=config_yaml)
 
             agent.halt()
@@ -415,7 +415,7 @@ class TestAuditPipeline:
 
     def _run_decisions(self, project_dir, config_yaml, n=5):
         """Run N mock decisions to populate audit logs."""
-        from chimera_compliance import ChimeraAgent, load_config
+        from chimera_runtime import ChimeraAgent, load_config
 
         config = load_config(config_yaml)
         results = []
@@ -432,7 +432,7 @@ class TestAuditPipeline:
                 },
             }])
 
-            with patch("chimera_compliance.agent.get_provider", return_value=mock_provider):
+            with patch("chimera_runtime.agent.get_provider", return_value=mock_provider):
                 agent = ChimeraAgent.from_config(config, config_path=config_yaml)
                 result = agent.decide(f"Request {i}")
                 results.append(result)
@@ -448,7 +448,7 @@ class TestAuditPipeline:
 
     def test_audit_query_stats(self, project_dir, config_yaml):
         """AuditQuery.stats() returns accurate aggregate metrics."""
-        from chimera_compliance import AuditQuery
+        from chimera_runtime import AuditQuery
 
         self._run_decisions(project_dir, config_yaml, n=5)
 
@@ -462,7 +462,7 @@ class TestAuditPipeline:
 
     def test_audit_query_filter(self, project_dir, config_yaml):
         """AuditQuery.filter() correctly filters by result type."""
-        from chimera_compliance import AuditQuery
+        from chimera_runtime import AuditQuery
 
         self._run_decisions(project_dir, config_yaml, n=5)
 
@@ -476,7 +476,7 @@ class TestAuditPipeline:
 
     def test_audit_load_single_record(self, project_dir, config_yaml):
         """load_record() retrieves a specific decision by ID."""
-        from chimera_compliance import load_record
+        from chimera_runtime import load_record
 
         results = self._run_decisions(project_dir, config_yaml, n=2)
         decision_id = results[0].decision_id
@@ -487,7 +487,7 @@ class TestAuditPipeline:
 
     def test_audit_export_json(self, project_dir, config_yaml):
         """AuditQuery.export() creates a valid JSON export file."""
-        from chimera_compliance import AuditQuery
+        from chimera_runtime import AuditQuery
 
         self._run_decisions(project_dir, config_yaml, n=3)
 
@@ -502,7 +502,7 @@ class TestAuditPipeline:
 
     def test_audit_cli_stats(self, runner, project_dir, config_yaml):
         """CLI audit --stats works end-to-end."""
-        from chimera_compliance.cli.main import cli
+        from chimera_runtime.cli.main import cli
 
         self._run_decisions(project_dir, config_yaml, n=4)
 
@@ -517,7 +517,7 @@ class TestAuditPipeline:
 
     def test_explain_generates_html(self, project_dir, config_yaml):
         """Art. 86 explain generates a valid HTML report."""
-        from chimera_compliance import load_record, generate_html
+        from chimera_runtime import load_record, generate_html
 
         results = self._run_decisions(project_dir, config_yaml, n=1)
         decision_id = results[0].decision_id
@@ -531,7 +531,7 @@ class TestAuditPipeline:
 
     def test_explain_cli_command(self, runner, project_dir, config_yaml):
         """CLI explain --id generates HTML file."""
-        from chimera_compliance.cli.main import cli
+        from chimera_runtime.cli.main import cli
 
         results = self._run_decisions(project_dir, config_yaml, n=1)
         decision_id = results[0].decision_id
@@ -560,7 +560,7 @@ class TestDocsGenerator:
 
     def _run_decisions(self, project_dir, config_yaml, n=3):
         """Same helper as audit tests."""
-        from chimera_compliance import ChimeraAgent, load_config
+        from chimera_runtime import ChimeraAgent, load_config
 
         config = load_config(config_yaml)
 
@@ -573,13 +573,13 @@ class TestDocsGenerator:
                     "urgency": "MEDIUM", "department": "MARKETING",
                 },
             }])
-            with patch("chimera_compliance.agent.get_provider", return_value=mock_provider):
+            with patch("chimera_runtime.agent.get_provider", return_value=mock_provider):
                 agent = ChimeraAgent.from_config(config, config_path=config_yaml)
                 agent.decide(f"Request {i}")
 
     def test_docs_generate_without_audit(self, project_dir, config_yaml):
         """Docs generate works even without audit data (11/19)."""
-        from chimera_compliance import AnnexIVGenerator, load_config
+        from chimera_runtime import AnnexIVGenerator, load_config
 
         config = load_config(config_yaml)
         gen = AnnexIVGenerator(
@@ -600,7 +600,7 @@ class TestDocsGenerator:
 
     def test_docs_generate_with_audit(self, project_dir, config_yaml):
         """Docs generate with audit data fills 14/19 sections."""
-        from chimera_compliance import AnnexIVGenerator, load_config
+        from chimera_runtime import AnnexIVGenerator, load_config
 
         self._run_decisions(project_dir, config_yaml, n=3)
 
@@ -622,7 +622,7 @@ class TestDocsGenerator:
 
     def test_docs_cli_generate(self, runner, project_dir, config_yaml):
         """CLI docs generate works end-to-end."""
-        from chimera_compliance.cli.main import cli
+        from chimera_runtime.cli.main import cli
 
         self._run_decisions(project_dir, config_yaml, n=2)
 
@@ -638,7 +638,7 @@ class TestDocsGenerator:
 
     def test_docs_cli_status(self, runner, project_dir, config_yaml):
         """CLI docs status shows coverage tree."""
-        from chimera_compliance.cli.main import cli
+        from chimera_runtime.cli.main import cli
 
         result = runner.invoke(cli, [
             "--config", config_yaml,
@@ -668,11 +668,11 @@ class TestFullLifecycle:
         7. Annex IV docs generated
         8. CLI commands all work
         """
-        from chimera_compliance import (
+        from chimera_runtime import (
             load_config, PolicyManager, ChimeraAgent,
             AuditQuery, load_record, generate_html,
         )
-        from chimera_compliance.cli.main import cli
+        from chimera_runtime.cli.main import cli
 
         # 1. CONFIG
         config = load_config(config_yaml)
@@ -707,7 +707,7 @@ class TestFullLifecycle:
                 "strategy": f"Lifecycle plan {i}",
                 "parameters": params,
             }])
-            with patch("chimera_compliance.agent.get_provider", return_value=mock_provider):
+            with patch("chimera_runtime.agent.get_provider", return_value=mock_provider):
                 agent = ChimeraAgent.from_config(config, config_path=config_yaml)
                 result = agent.decide(f"Lifecycle request {i}")
                 decision_ids.append(result.decision_id)
@@ -748,7 +748,7 @@ class TestFullLifecycle:
 
         # 7. ANNEX IV DOCS
         try:
-            from chimera_compliance import AnnexIVGenerator
+            from chimera_runtime import AnnexIVGenerator
 
             gen = AnnexIVGenerator(
                 config=config,
@@ -819,7 +819,7 @@ class TestFullLifecycle:
 
     def test_policy_hot_reload(self, project_dir, config_yaml):
         """Policy hot-reload detects content changes."""
-        from chimera_compliance import PolicyManager
+        from chimera_runtime import PolicyManager
 
         policy_path = str(project_dir / "policies" / "governance.csl")
         pm = PolicyManager(policy_path, auto_verify=True)
@@ -835,7 +835,7 @@ class TestFullLifecycle:
 
     def test_retention_enforcement(self, project_dir, config_yaml):
         """Retention enforcement removes old records."""
-        from chimera_compliance import enforce_retention
+        from chimera_runtime import enforce_retention
         import time
 
         audit_dir = str(project_dir / "audit_logs")

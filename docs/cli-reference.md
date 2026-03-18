@@ -1,13 +1,13 @@
 # CLI Reference
 
-Complete reference for all `chimera-compliance` CLI commands.
+Complete reference for all `chimera-runtime` CLI commands.
 
 ---
 
 ## Global Options
 
 ```bash
-chimera-compliance [OPTIONS] COMMAND [ARGS]
+chimera-runtime [OPTIONS] COMMAND [ARGS]
 ```
 
 | Option | Description |
@@ -21,10 +21,10 @@ chimera-compliance [OPTIONS] COMMAND [ARGS]
 
 ## `init`
 
-Initialize a new chimera-compliance project.
+Initialize a new chimera-runtime project.
 
 ```bash
-chimera-compliance init [OPTIONS]
+chimera-runtime init [OPTIONS]
 ```
 
 | Option | Description |
@@ -56,13 +56,13 @@ chimera-compliance init [OPTIONS]
 
 ```bash
 # Interactive setup
-chimera-compliance init
+chimera-runtime init
 
 # Quick setup with defaults
-chimera-compliance init --non-interactive
+chimera-runtime init --non-interactive
 
 # Integration mode directly
-chimera-compliance init --mode integration
+chimera-runtime init --mode integration
 ```
 
 ---
@@ -72,7 +72,7 @@ chimera-compliance init --mode integration
 Start the agent in interactive or daemon mode. Requires standalone mode configuration with an LLM provider.
 
 ```bash
-chimera-compliance run [OPTIONS]
+chimera-runtime run [OPTIONS]
 ```
 
 | Option | Description |
@@ -100,19 +100,19 @@ chimera-compliance run [OPTIONS]
 
 ```bash
 # Interactive mode
-chimera-compliance run
+chimera-runtime run
 
 # With human confirmation
-chimera-compliance run --require-confirmation
+chimera-runtime run --require-confirmation
 
 # Dry run (shadow mode)
-chimera-compliance run --dry-run
+chimera-runtime run --dry-run
 
 # Override model
-chimera-compliance run -m claude-sonnet-4-20250514
+chimera-runtime run -m claude-sonnet-4-20250514
 
 # Daemon mode
-echo '{"request": "Approve $50k for marketing"}' | chimera-compliance run --daemon
+echo '{"request": "Approve $50k for marketing"}' | chimera-runtime run --daemon
 ```
 
 ---
@@ -122,7 +122,7 @@ echo '{"request": "Approve $50k for marketing"}' | chimera-compliance run --daem
 Stop a running daemon agent.
 
 ```bash
-chimera-compliance stop [OPTIONS]
+chimera-runtime stop [OPTIONS]
 ```
 
 | Option | Description |
@@ -136,7 +136,7 @@ chimera-compliance stop [OPTIONS]
 Run end-to-end system validation. Tests the entire setup without requiring user interaction.
 
 ```bash
-chimera-compliance test [OPTIONS]
+chimera-runtime test [OPTIONS]
 ```
 
 | Option | Description |
@@ -164,10 +164,10 @@ Exit code: `0` if all checks pass, `1` if any fail.
 
 ```bash
 # Test everything except LLM
-chimera-compliance test --skip-llm
+chimera-runtime test --skip-llm
 
 # Test with a specific policy
-chimera-compliance test -p policies/governance.yaml --skip-llm
+chimera-runtime test -p policies/governance.yaml --skip-llm
 ```
 
 ---
@@ -177,7 +177,7 @@ chimera-compliance test -p policies/governance.yaml --skip-llm
 Verify a policy file. For CSL files, runs the full Z3 verification pipeline (syntax → semantics → Z3 logic → IR compilation). For YAML files, validates syntax and rule structure.
 
 ```bash
-chimera-compliance verify [POLICY_FILE]
+chimera-runtime verify [POLICY_FILE]
 ```
 
 If `POLICY_FILE` is omitted, uses the policy from config.
@@ -186,11 +186,11 @@ If `POLICY_FILE` is omitted, uses the policy from config.
 
 ```bash
 # Verify the configured policy
-chimera-compliance verify
+chimera-runtime verify
 
 # Verify a specific file
-chimera-compliance verify policies/governance.yaml
-chimera-compliance verify policies/governance.csl
+chimera-runtime verify policies/governance.yaml
+chimera-runtime verify policies/governance.csl
 ```
 
 ---
@@ -204,7 +204,7 @@ Policy management commands.
 Create a new CSL policy file from a template.
 
 ```bash
-chimera-compliance policy new NAME [OPTIONS]
+chimera-runtime policy new NAME [OPTIONS]
 ```
 
 | Option | Description |
@@ -214,8 +214,8 @@ chimera-compliance policy new NAME [OPTIONS]
 **Examples:**
 
 ```bash
-chimera-compliance policy new PaymentGuard
-chimera-compliance policy new HRPolicy --dir ./policies/hr
+chimera-runtime policy new PaymentGuard
+chimera-runtime policy new HRPolicy --dir ./policies/hr
 ```
 
 ### `policy list`
@@ -223,7 +223,7 @@ chimera-compliance policy new HRPolicy --dir ./policies/hr
 List all policy files and their status.
 
 ```bash
-chimera-compliance policy list [OPTIONS]
+chimera-runtime policy list [OPTIONS]
 ```
 
 | Option | Description |
@@ -237,7 +237,7 @@ Discovers both `.csl` and `.yaml`/`.yml` files. Shows domain name, constraint co
 Simulate a policy against test input.
 
 ```bash
-chimera-compliance policy simulate POLICY_FILE [CONTEXT_JSON] [OPTIONS]
+chimera-runtime policy simulate POLICY_FILE [CONTEXT_JSON] [OPTIONS]
 ```
 
 | Option | Description |
@@ -253,13 +253,13 @@ Supports batch simulation: pass a JSON array of objects via `--input`.
 
 ```bash
 # Inline JSON
-chimera-compliance policy simulate policies/governance.yaml '{"amount": 50000, "role": "MANAGER"}'
+chimera-runtime policy simulate policies/governance.yaml '{"amount": 50000, "role": "MANAGER"}'
 
 # From file
-chimera-compliance policy simulate policies/governance.yaml --input test_cases.json
+chimera-runtime policy simulate policies/governance.yaml --input test_cases.json
 
 # Dry run
-chimera-compliance policy simulate policies/governance.yaml '{"amount": 999999}' --dry-run
+chimera-runtime policy simulate policies/governance.yaml '{"amount": 999999}' --dry-run
 ```
 
 ---
@@ -269,7 +269,7 @@ chimera-compliance policy simulate policies/governance.yaml '{"amount": 999999}'
 Query and manage audit records.
 
 ```bash
-chimera-compliance audit [OPTIONS]
+chimera-runtime audit [OPTIONS]
 ```
 
 | Option | Description |
@@ -289,25 +289,25 @@ chimera-compliance audit [OPTIONS]
 
 ```bash
 # Last 10 decisions
-chimera-compliance audit --last 10
+chimera-runtime audit --last 10
 
 # Blocked decisions only
-chimera-compliance audit --result BLOCKED
+chimera-runtime audit --result BLOCKED
 
 # Decisions in a date range
-chimera-compliance audit --after 2026-01-01T00:00:00Z --before 2026-02-01T00:00:00Z
+chimera-runtime audit --after 2026-01-01T00:00:00Z --before 2026-02-01T00:00:00Z
 
 # Specific decision
-chimera-compliance audit --id dec_a1b2c3d4e5f6
+chimera-runtime audit --id dec_a1b2c3d4e5f6
 
 # Statistics
-chimera-compliance audit --stats
+chimera-runtime audit --stats
 
 # Top violations
-chimera-compliance audit --violations
+chimera-runtime audit --violations
 
 # Export
-chimera-compliance audit --export report.json --format compact
+chimera-runtime audit --export report.json --format compact
 ```
 
 ---
@@ -317,7 +317,7 @@ chimera-compliance audit --export report.json --format compact
 Generate an Art. 86 Right to Explanation report for a specific decision. Produces a self-contained HTML report.
 
 ```bash
-chimera-compliance explain --id DECISION_ID [OPTIONS]
+chimera-runtime explain --id DECISION_ID [OPTIONS]
 ```
 
 | Option | Description |
@@ -331,13 +331,13 @@ chimera-compliance explain --id DECISION_ID [OPTIONS]
 
 ```bash
 # Generate explanation
-chimera-compliance explain --id dec_a1b2c3d4e5f6
+chimera-runtime explain --id dec_a1b2c3d4e5f6
 
 # Generate and open in browser
-chimera-compliance explain --id dec_a1b2c3d4e5f6 --open
+chimera-runtime explain --id dec_a1b2c3d4e5f6 --open
 
 # Custom output path
-chimera-compliance explain --id dec_a1b2c3d4e5f6 --output ./reports/q1_review.html
+chimera-runtime explain --id dec_a1b2c3d4e5f6 --output ./reports/q1_review.html
 ```
 
 ---
@@ -347,7 +347,7 @@ chimera-compliance explain --id dec_a1b2c3d4e5f6 --output ./reports/q1_review.ht
 Generate EU AI Act Annex IV technical documentation.
 
 ```bash
-chimera-compliance docs [generate|status|refresh]
+chimera-runtime docs [generate|status|refresh]
 ```
 
 ### `docs generate`

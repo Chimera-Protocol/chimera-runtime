@@ -2,9 +2,9 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
-# Install chimera-compliance + dashboard deps
+# Install chimera-runtime + dashboard deps
 COPY pyproject.toml README.md ./
-COPY chimera_compliance/ chimera_compliance/
+COPY chimera_runtime/ chimera_runtime/
 COPY policies/ policies/
 COPY dashboard/backend/ dashboard/backend/
 COPY dashboard/backend/requirements.txt dashboard/backend/requirements.txt

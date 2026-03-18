@@ -1,7 +1,7 @@
 """
 End-to-End Scenario Test: AcmePay — A Fintech Startup's Compliance Journey
 
-Simulates a real fintech company (AcmePay) adopting chimera-compliance
+Simulates a real fintech company (AcmePay) adopting chimera-runtime
 for EU AI Act compliance. Covers the full lifecycle:
 
   Phase 1: Company Setup — init, CSL policy (Z3 verified), config
@@ -27,20 +27,20 @@ import pytest
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from chimera_compliance.agent import ChimeraAgent, AgentHalted
-from chimera_compliance.llm.base import BaseLLMProvider, LLMError
-from chimera_compliance.policy import PolicyManager, CSL_CORE_AVAILABLE
-from chimera_compliance.oversight import HumanOversight
-from chimera_compliance.models import (
+from chimera_runtime.agent import ChimeraAgent, AgentHalted
+from chimera_runtime.llm.base import BaseLLMProvider, LLMError
+from chimera_runtime.policy import PolicyManager, CSL_CORE_AVAILABLE
+from chimera_runtime.oversight import HumanOversight
+from chimera_runtime.models import (
     AgentConfig, AgentMetaConfig, LLMConfig, PolicyConfig,
     AuditConfig, OversightConfig, HumanOversightRecord,
 )
-from chimera_compliance.config import save_config, load_config
-from chimera_compliance.audit.storage import save_record, load_record, load_all_records
-from chimera_compliance.audit.query import AuditQuery
-from chimera_compliance.audit.html_report import generate_html
+from chimera_runtime.config import save_config, load_config
+from chimera_runtime.audit.storage import save_record, load_record, load_all_records
+from chimera_runtime.audit.query import AuditQuery
+from chimera_runtime.audit.html_report import generate_html
 from click.testing import CliRunner
-from chimera_compliance.cli.main import cli
+from chimera_runtime.cli.main import cli
 
 
 # Skip the entire module if CSL-Core is not available
@@ -564,7 +564,7 @@ def test_acmepay_full_journey(tmp_path):
     # using real audit data — no hardcoded content.
 
     try:
-        from chimera_compliance.docs import AnnexIVGenerator
+        from chimera_runtime.docs import AnnexIVGenerator
 
         saved_config = load_config(str(config_path))
         gen = AnnexIVGenerator(

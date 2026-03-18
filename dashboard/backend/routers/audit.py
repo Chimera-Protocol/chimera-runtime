@@ -1,7 +1,7 @@
 """
 Audit API Router — /api/v1/audit/*
 
-Wraps chimera_compliance's AuditQuery for the dashboard.
+Wraps chimera_runtime's AuditQuery for the dashboard.
 Tier limits are applied at the service layer (cloud dashboard only).
 """
 

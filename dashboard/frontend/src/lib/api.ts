@@ -1,4 +1,4 @@
-// API client for the Chimera Compliance Dashboard backend
+// API client for the Chimera Runtime Dashboard backend
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
 

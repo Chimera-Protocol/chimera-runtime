@@ -1,17 +1,17 @@
 # Architecture
 
-How chimera-compliance works, from request to audited decision.
+How chimera-runtime works, from request to audited decision.
 
 ---
 
 ## Overview
 
-chimera-compliance operates as a **deterministic compliance layer** between AI agents and the actions they take. It enforces policies before actions execute and records every decision for auditability.
+chimera-runtime operates as a **deterministic execution layer** between AI agents and the actions they take. It enforces policies before actions execute and records every decision for auditability.
 
 There are two operating modes:
 
-1. **Integration mode** — chimera-compliance wraps tool calls in an external agent framework (LangChain, LangGraph, etc.)
-2. **Standalone mode** — chimera-compliance orchestrates the full neural-symbolic pipeline including LLM interaction
+1. **Integration mode** — chimera-runtime wraps tool calls in an external agent framework (LangChain, LangGraph, etc.)
+2. **Standalone mode** — chimera-runtime orchestrates the full neural-symbolic pipeline including LLM interaction
 
 ---
 
@@ -43,7 +43,7 @@ Tool Call Intercepted
 
 ### ComplianceGuard
 
-`ComplianceGuard` (`chimera_compliance.integrations.ComplianceGuard`) is the core class used by all integrations. It combines:
+`ComplianceGuard` (`chimera_runtime.integrations.ComplianceGuard`) is the core class used by all integrations. It combines:
 
 - **PolicyManager** — loads and evaluates the policy file
 - **Audit recording** — writes a `DecisionAuditRecord` for every check
@@ -71,7 +71,7 @@ Every call to `guard.check()` produces:
 
 ## Standalone Mode Pipeline
 
-When chimera-compliance manages the LLM directly via `ChimeraAgent`:
+When chimera-runtime manages the LLM directly via `ChimeraAgent`:
 
 ```
 Natural Language Request
@@ -112,7 +112,7 @@ Natural Language Request
 
 **Policy gate**: Each candidate's parameters are evaluated against the loaded policy. Only candidates that pass all rules are considered.
 
-**Retry with rejection context**: If all candidates are blocked, chimera-compliance feeds the violation details back to the LLM as rejection context, asking it to generate new candidates that avoid the violated constraints. This continues for `max_retries` (default: 3) attempts.
+**Retry with rejection context**: If all candidates are blocked, chimera-runtime feeds the violation details back to the LLM as rejection context, asking it to generate new candidates that avoid the violated constraints. This continues for `max_retries` (default: 3) attempts.
 
 **Best-candidate selection**: Among allowed candidates, the one with the highest LLM confidence score is selected.
 
@@ -120,12 +120,12 @@ Natural Language Request
 
 ## Policy Engine
 
-`PolicyManager` (`chimera_compliance.policy.PolicyManager`) automatically selects the evaluation backend based on file extension:
+`PolicyManager` (`chimera_runtime.policy.PolicyManager`) automatically selects the evaluation backend based on file extension:
 
 | File Extension | Backend | Verification | Dependency |
 |---------------|---------|-------------|------------|
 | `.yaml` / `.yml` | YAMLRuleEngine | Syntax validation | None (built-in) |
-| `.csl` | CSL-Core + Z3 | Formal verification (Z3 SAT) | `pip install chimera-compliance[csl]` |
+| `.csl` | CSL-Core + Z3 | Formal verification (Z3 SAT) | `pip install chimera-runtime[csl]` |
 
 ### YAML Rule Engine
 
@@ -144,7 +144,7 @@ rules:
 Optional backend providing mathematically provable policy enforcement. Policies are written in CSL (Constraint Specification Language) and compiled to Z3 constraints.
 
 ```
-pip install chimera-compliance[csl]
+pip install chimera-runtime[csl]
 ```
 
 CSL provides:

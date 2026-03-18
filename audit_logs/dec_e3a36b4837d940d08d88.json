@@ -1,0 +1,105 @@
+{
+  "schema_version": "1.0.0",
+  "decision_id": "dec_e3a36b4837d940d08d88",
+  "timestamp": "2026-03-18T17:31:35.824Z",
+  "agent": {
+    "name": "chimera-runtime-guard",
+    "version": "1.0.0",
+    "csl_core_version": "N/A",
+    "model": "integration",
+    "model_provider": "external",
+    "temperature": 0.0
+  },
+  "input": {
+    "raw_request": "Tool call: approve_spend",
+    "structured_params": {
+      "amount": 50000,
+      "role": "USER"
+    },
+    "context": {}
+  },
+  "reasoning": {
+    "total_candidates": 1,
+    "total_attempts": 1,
+    "attempts": [
+      {
+        "attempt_number": 1,
+        "candidates": [
+          {
+            "candidate_id": "ext_001",
+            "strategy": "approve_spend",
+            "llm_reasoning": "External agent tool call",
+            "llm_confidence": 1.0,
+            "parameters": {
+              "amount": 50000,
+              "role": "USER"
+            },
+            "policy_evaluation": {
+              "policy_file": "/private/var/folders/g0/6b1hpsss7b5cryrcj27r70mw0000gn/T/pytest-of-aytugakarlar/pytest-3/test_blocked_function_call0/test_policy.yaml",
+              "policy_hash": "sha256:b87299b376b4aea055dba0dd0f408e46e9313b4c35c244e672ccda6761d9c21d",
+              "result": "BLOCKED",
+              "duration_ms": 0.034,
+              "violations": [
+                {
+                  "constraint": "amount_limit",
+                  "rule": "amount > 10000",
+                  "trigger_values": {
+                    "amount": 50000,
+                    "role": "USER"
+                  },
+                  "explanation": "Amount exceeds $10,000 limit"
+                },
+                {
+                  "constraint": "admin_required",
+                  "rule": "role == 'USER' and amount > 1000",
+                  "trigger_values": {
+                    "amount": 50000,
+                    "role": "USER"
+                  },
+                  "explanation": "Users limited to $1,000"
+                }
+              ]
+            }
+          }
+        ],
+        "outcome": "ALL_BLOCKED",
+        "note": ""
+      }
+    ],
+    "selected_candidate": null,
+    "selection_reasoning": ""
+  },
+  "decision": {
+    "action_taken": "approve_spend",
+    "result": "BLOCKED",
+    "final_parameters": {},
+    "policy_file": "/private/var/folders/g0/6b1hpsss7b5cryrcj27r70mw0000gn/T/pytest-of-aytugakarlar/pytest-3/test_blocked_function_call0/test_policy.yaml",
+    "policy_hash": "sha256:b87299b376b4aea055dba0dd0f408e46e9313b4c35c244e672ccda6761d9c21d"
+  },
+  "compliance": {
+    "eu_ai_act": {
+      "article_12_record_keeping": true,
+      "article_13_transparency": true,
+      "article_14_human_oversight": true,
+      "article_15_adversarial_resilience": true,
+      "article_19_auto_logs": true,
+      "article_86_right_to_explanation": true
+    },
+    "formal_verification": {
+      "policy_verified": true,
+      "verification_engine": "Z3",
+      "verification_result": "SAT"
+    },
+    "human_oversight": {
+      "override_available": true,
+      "stop_mechanism": true,
+      "policy_human_editable": true
+    }
+  },
+  "performance": {
+    "total_duration_ms": 0.034,
+    "llm_duration_ms": 0.0,
+    "policy_evaluation_ms": 0.0,
+    "audit_generation_ms": 0.0
+  }
+}

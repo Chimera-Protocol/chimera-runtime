@@ -1,5 +1,5 @@
 """
-Tests for chimera_compliance.cli
+Tests for chimera_runtime.cli
 
 Tests all CLI commands using Click's CliRunner for in-process testing.
 Each command is tested for:
@@ -16,7 +16,7 @@ from pathlib import Path
 
 from click.testing import CliRunner
 
-from chimera_compliance.cli.main import cli
+from chimera_runtime.cli.main import cli
 
 
 # ============================================================================
@@ -84,12 +84,12 @@ oversight:
 
 def _populate_audit(audit_dir: str, n: int = 3):
     """Create sample audit records."""
-    from chimera_compliance.models import (
+    from chimera_runtime.models import (
         AgentInfo, InputInfo, Attempt, Candidate, PolicyEvaluation,
         Violation,
     )
-    from chimera_compliance.audit.recorder import build_audit_record
-    from chimera_compliance.audit.storage import save_record
+    from chimera_runtime.audit.recorder import build_audit_record
+    from chimera_runtime.audit.storage import save_record
 
     for i in range(n):
         result = "ALLOWED" if i % 2 == 0 else "BLOCKED"
@@ -154,7 +154,7 @@ class TestVersionAndHelp:
     def test_version(self, runner):
         result = runner.invoke(cli, ["--version"])
         assert result.exit_code == 0
-        assert "chimera-compliance" in result.output
+        assert "chimera-runtime" in result.output
 
     def test_help(self, runner):
         result = runner.invoke(cli, ["--help"])

@@ -1,4 +1,4 @@
-// TypeScript types mirroring Python chimera_compliance.models
+// TypeScript types mirroring Python chimera_runtime.models
 
 export type DecisionResult = "ALLOWED" | "BLOCKED" | "HUMAN_OVERRIDE" | "INTERRUPTED";
 

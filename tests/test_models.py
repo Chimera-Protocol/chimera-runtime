@@ -1,5 +1,5 @@
 """
-Tests for chimera_compliance.models
+Tests for chimera_runtime.models
 
 Validates:
   - Every dataclass has working to_dict() and from_dict()
@@ -15,7 +15,7 @@ from datetime import datetime, timezone
 
 import pytest
 
-from chimera_compliance.models import (
+from chimera_runtime.models import (
     # Config models
     AgentConfig,
     LLMConfig,
@@ -125,7 +125,7 @@ def sample_audit_record(sample_attempt):
         decision_id="dec_a1b2c3d4e5f6g7h8i9j0",
         timestamp="2026-02-25T14:32:07.841Z",
         agent=AgentInfo(
-            name="chimera-compliance",
+            name="chimera-runtime",
             version="0.1.0",
             csl_core_version="0.3.0",
             model="gpt-4o",
@@ -250,7 +250,7 @@ class TestConfigModels:
 
     def test_agent_config_defaults(self):
         cfg = AgentConfig()
-        assert cfg.agent.name == "chimera-compliance"
+        assert cfg.agent.name == "chimera-runtime"
         assert cfg.agent.version == "0.1.0"
         assert cfg.llm.provider == "openai"
         assert cfg.audit.retention_days == 180

@@ -1,5 +1,5 @@
 """
-Tests for chimera_compliance.audit
+Tests for chimera_runtime.audit
 
 Validates:
   - build_audit_record() assembles correct DecisionAuditRecord
@@ -22,7 +22,7 @@ import pytest
 from pathlib import Path
 from typing import List
 
-from chimera_compliance.audit import (
+from chimera_runtime.audit import (
     build_audit_record,
     save_record,
     load_record,
@@ -33,7 +33,7 @@ from chimera_compliance.audit import (
     AuditStats,
     generate_html,
 )
-from chimera_compliance.models import (
+from chimera_runtime.models import (
     AgentInfo,
     Attempt,
     Candidate,
@@ -63,7 +63,7 @@ def audit_dir(tmp_path):
 @pytest.fixture
 def sample_agent_info():
     return AgentInfo(
-        name="chimera-compliance",
+        name="chimera-runtime",
         version="0.1.0",
         csl_core_version="0.3.0",
         model="gpt-4o",
@@ -150,7 +150,7 @@ def _make_record(
 
     return build_audit_record(
         agent_info=agent_info or AgentInfo(
-            name="chimera-compliance", version="0.1.0", csl_core_version="0.3.0",
+            name="chimera-runtime", version="0.1.0", csl_core_version="0.3.0",
             model="gpt-4o", model_provider="openai", temperature=0.7,
         ),
         input_info=input_info or InputInfo(
@@ -203,7 +203,7 @@ class TestBuildAuditRecord:
         assert record.decision_id.startswith("dec_")
         assert record.timestamp.endswith("Z")
         assert record.decision.result == "ALLOWED"
-        assert record.agent.name == "chimera-compliance"
+        assert record.agent.name == "chimera-runtime"
 
     def test_custom_decision_id_and_timestamp(self, sample_agent_info, sample_input_info):
         record = build_audit_record(

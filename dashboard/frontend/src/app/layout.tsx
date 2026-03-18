@@ -15,9 +15,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Chimera Compliance | EU AI Act Dashboard",
+  title: "Chimera Runtime | AI Agent Control Plane",
   description:
-    "Premium compliance monitoring dashboard for AI agents. Real-time audit tracking, policy management, and EU AI Act readiness.",
+    "Deterministic runtime for AI agents. Real-time enforcement monitoring, policy management, and EU AI Act readiness.",
 };
 
 export default function RootLayout({

@@ -11,8 +11,8 @@ from collections import Counter, defaultdict
 from datetime import datetime, timezone, timedelta
 from typing import Any, Dict, List, Optional
 
-from chimera_compliance.audit.storage import load_all_records
-from chimera_compliance.models import DecisionAuditRecord
+from chimera_runtime.audit.storage import load_all_records
+from chimera_runtime.models import DecisionAuditRecord
 
 
 class AnalyticsService:

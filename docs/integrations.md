@@ -1,6 +1,6 @@
 # Framework Integrations
 
-chimera-compliance plugs into any AI agent framework. Each integration wraps tool/function calls with a compliance guard that evaluates parameters against your policy before execution.
+chimera-runtime plugs into any AI agent framework. Each integration wraps tool/function calls with a runtime guard that evaluates parameters against your policy before execution.
 
 ---
 
@@ -26,7 +26,7 @@ Every call is audited automatically — a `DecisionAuditRecord` is written to di
 ## LangChain
 
 ```bash
-pip install chimera-compliance[langchain]
+pip install chimera-runtime[langchain]
 ```
 
 ### `wrap_tools()` — Wrap Multiple Tools
@@ -35,7 +35,7 @@ The simplest approach. Wraps all tools in-place with compliance checking.
 
 ```python
 from langchain_core.tools import tool
-from chimera_compliance.integrations.langchain import wrap_tools
+from chimera_runtime.integrations.langchain import wrap_tools
 
 @tool
 def approve_budget(amount: int, department: str) -> str:
@@ -78,8 +78,8 @@ guarded_tools = wrap_tools(
 For fine-grained control over individual tools:
 
 ```python
-from chimera_compliance.integrations import ComplianceGuard
-from chimera_compliance.integrations.langchain import ChimeraComplianceTool
+from chimera_runtime.integrations import ComplianceGuard
+from chimera_runtime.integrations.langchain import ChimeraComplianceTool
 
 guard = ComplianceGuard(policy="./policies/governance.yaml")
 
@@ -98,7 +98,7 @@ wrapper = ChimeraComplianceTool(
 Intercepts tool calls at the callback level:
 
 ```python
-from chimera_compliance.integrations.langchain import ChimeraCallbackHandler
+from chimera_runtime.integrations.langchain import ChimeraCallbackHandler
 
 handler = ChimeraCallbackHandler(
     policy="./policies/governance.yaml",
@@ -120,16 +120,16 @@ When `on_block="raise"`, a `ComplianceError` is raised on blocked actions. When 
 ## LangGraph
 
 ```bash
-pip install chimera-compliance[langgraph]
+pip install chimera-runtime[langgraph]
 ```
 
 ### `compliance_node()` — Graph Node
 
-Creates a node function that gates actions through the compliance guard. Reads parameters from the graph state, evaluates them, and writes the result back.
+Creates a node function that gates actions through the runtime guard. Reads parameters from the graph state, evaluates them, and writes the result back.
 
 ```python
 from langgraph.graph import StateGraph
-from chimera_compliance.integrations.langgraph import compliance_node, compliance_edge
+from chimera_runtime.integrations.langgraph import compliance_node, compliance_edge
 
 # Create the compliance node
 check = compliance_node(
@@ -196,7 +196,7 @@ route = compliance_edge(
 ## CrewAI
 
 ```bash
-pip install chimera-compliance[crewai]
+pip install chimera-runtime[crewai]
 ```
 
 ### `wrap_crew_tools()` — Wrap Crew Tools
@@ -205,7 +205,7 @@ Wraps CrewAI tools by monkey-patching their `_run()` method:
 
 ```python
 from crewai.tools import BaseTool
-from chimera_compliance.integrations.crewai import wrap_crew_tools
+from chimera_runtime.integrations.crewai import wrap_crew_tools
 
 # Your CrewAI tools
 class BudgetTool(BaseTool):
@@ -244,7 +244,7 @@ Tools are modified in-place. If a tool call is blocked, `ComplianceError` is rai
 ## LlamaIndex
 
 ```bash
-pip install chimera-compliance[llamaindex]
+pip install chimera-runtime[llamaindex]
 ```
 
 ### `wrap_tools()` — Wrap LlamaIndex Tools
@@ -253,7 +253,7 @@ Creates new `FunctionTool` wrappers that check compliance before calling the ori
 
 ```python
 from llama_index.core.tools import FunctionTool
-from chimera_compliance.integrations.llamaindex import wrap_tools
+from chimera_runtime.integrations.llamaindex import wrap_tools
 
 def approve_budget(amount: int, department: str) -> str:
     """Approve budget allocation."""
@@ -285,8 +285,8 @@ guarded_tools = wrap_tools(
 ### `wrap_tool()` — Wrap Single Tool
 
 ```python
-from chimera_compliance.integrations import ComplianceGuard
-from chimera_compliance.integrations.llamaindex import wrap_tool
+from chimera_runtime.integrations import ComplianceGuard
+from chimera_runtime.integrations.llamaindex import wrap_tool
 
 guard = ComplianceGuard(policy="./policies/governance.yaml")
 guarded = wrap_tool(tool, guard)
@@ -297,7 +297,7 @@ guarded = wrap_tool(tool, guard)
 ## AutoGen
 
 ```bash
-pip install chimera-compliance[autogen]
+pip install chimera-runtime[autogen]
 ```
 
 ### `guard_function_call()` — Decorator
@@ -305,7 +305,7 @@ pip install chimera-compliance[autogen]
 The simplest way to add compliance to AutoGen function calls:
 
 ```python
-from chimera_compliance.integrations.autogen import guard_function_call
+from chimera_runtime.integrations.autogen import guard_function_call
 
 @guard_function_call(policy="./policies/governance.yaml")
 def transfer_funds(amount: int, destination: str) -> str:
@@ -343,7 +343,7 @@ This maps the function's `amt` parameter to the policy's `amount` variable, and 
 Wraps an AutoGen agent's entire function map:
 
 ```python
-from chimera_compliance.integrations.autogen import ChimeraComplianceAgent
+from chimera_runtime.integrations.autogen import ChimeraComplianceAgent
 
 # Your AutoGen agent
 # agent = AssistantAgent(name="finance_bot", ...)
@@ -358,7 +358,7 @@ compliant_agent = ChimeraComplianceAgent(
 # Attribute access is proxied to the underlying agent
 ```
 
-When a function call is blocked, instead of raising an error, `ChimeraComplianceAgent` returns a message string: `"[BLOCKED by chimera-compliance] violation details..."`. This keeps the AutoGen conversation flowing.
+When a function call is blocked, instead of raising an error, `ChimeraComplianceAgent` returns a message string: `"[BLOCKED by chimera-runtime] violation details..."`. This keeps the AutoGen conversation flowing.
 
 ---
 
@@ -367,7 +367,7 @@ When a function call is blocked, instead of raising an error, `ChimeraCompliance
 All integrations use `ComplianceGuard` internally. You can use it directly for custom integrations:
 
 ```python
-from chimera_compliance.integrations import ComplianceGuard
+from chimera_runtime.integrations import ComplianceGuard
 
 guard = ComplianceGuard(
     policy="./policies/governance.yaml",
@@ -401,7 +401,7 @@ print(pm.backend)  # "csl-core" or "yaml-rule-engine"
 All integrations raise `ComplianceError` when an action is blocked:
 
 ```python
-from chimera_compliance.integrations.base import ComplianceError
+from chimera_runtime.integrations.base import ComplianceError
 
 try:
     guarded_tool.run(amount=999999, role="ANALYST")
@@ -420,8 +420,8 @@ except ComplianceError as e:
 To build your own integration for a framework not listed above:
 
 ```python
-from chimera_compliance.integrations import ComplianceGuard
-from chimera_compliance.integrations.base import ComplianceError
+from chimera_runtime.integrations import ComplianceGuard
+from chimera_runtime.integrations.base import ComplianceError
 
 class MyFrameworkGuard:
     def __init__(self, policy: str, audit_dir: str = "./audit_logs"):

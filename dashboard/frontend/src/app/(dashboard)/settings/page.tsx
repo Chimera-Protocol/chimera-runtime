@@ -495,7 +495,7 @@ export default function SettingsPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-[#71717a]">
-              Use API keys for programmatic access to the Chimera Compliance API.
+              Use API keys for programmatic access to the Chimera Runtime API.
             </p>
 
             {/* Create New Key */}

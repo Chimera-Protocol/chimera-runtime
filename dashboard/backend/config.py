@@ -8,13 +8,13 @@ from dataclasses import dataclass, field
 
 @dataclass
 class DashboardConfig:
-    """Configuration for the Chimera Compliance Dashboard."""
+    """Configuration for the Chimera Runtime Dashboard."""
 
     # Server
     host: str = "0.0.0.0"
     port: int = 8000
 
-    # Paths — relative to chimera-compliance project root
+    # Paths — relative to chimera-runtime project root
     audit_dir: str = "./audit_logs"
     policies_dir: str = "./policies"
     config_path: str = "./.chimera/config.yaml"

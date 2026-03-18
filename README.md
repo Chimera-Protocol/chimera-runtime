@@ -1,78 +1,76 @@
 <p align="center">
-  <img src=".github/banner.png" alt="chimera-compliance" width="600">
+  <img src=".github/github_banner.png" alt="chimera-runtime" width="800">
 </p>
 
-<h1 align="center">chimera-compliance</h1>
+<h1 align="center">chimera-runtime</h1>
 
 <p align="center">
-  <strong>EU AI Act compliance layer for AI agents</strong><br>
-  Plug into any agent framework. Enforce deterministic policy guards. Audit every decision.
+  <strong>Deterministic Runtime for AI Agents</strong><br>
+  Stop trusting LLMs. Start constraining them.
 </p>
 
 <p align="center">
-  <a href="https://pypi.org/project/chimera-compliance/"><img src="https://img.shields.io/pypi/v/chimera-compliance?color=blue&logo=pypi" alt="PyPI"></a>
-  <a href="https://pypi.org/project/chimera-compliance/"><img src="https://img.shields.io/pypi/pyversions/chimera-compliance?logo=python" alt="Python"></a>
-  <a href="https://github.com/akarlaraytu/chimera-compliance/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-green" alt="License"></a>
-  <a href="https://compliance.chimera-protocol.com"><img src="https://img.shields.io/badge/dashboard-live-6366f1" alt="Dashboard"></a>
+  <a href="https://pypi.org/project/chimera-runtime/"><img src="https://img.shields.io/pypi/v/chimera-runtime?color=blue&logo=pypi" alt="PyPI"></a>
+  <a href="https://pypi.org/project/chimera-runtime/"><img src="https://img.shields.io/pypi/pyversions/chimera-runtime?logo=python" alt="Python"></a>
+  <a href="https://github.com/akarlaraytu/chimera-runtime/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-green" alt="License"></a>
+  <a href="https://runtime.chimera-protocol.com"><img src="https://img.shields.io/badge/dashboard-live-6366f1" alt="Dashboard"></a>
   <a href="https://pypi.org/project/csl-core/"><img src="https://img.shields.io/badge/powered%20by-CSL--Core-cyan" alt="CSL-Core"></a>
 </p>
 
 <p align="center">
   <a href="#quickstart">Quickstart</a> &bull;
+  <a href="#define-constraints">Constraints</a> &bull;
+  <a href="#framework-integrations">Integrations</a> &bull;
   <a href="#dashboard">Dashboard</a> &bull;
-  <a href="#architecture">Architecture</a> &bull;
-  <a href="#agent-framework-integrations">Integrations</a> &bull;
-  <a href="#eu-ai-act-compliance">EU AI Act</a>
+  <a href="#how-it-works">How It Works</a>
 </p>
 
 ---
 
-## What is chimera-compliance?
+## The Problem
 
-**chimera-compliance** is a plug-in compliance layer for AI agents. It wraps any agent framework (LangChain, LangGraph, LlamaIndex, CrewAI, AutoGen) with deterministic policy guards that **BLOCK**, **ALLOW**, or **ASK_HUMAN** before every action executes.
+LLMs don't follow rules. They approximate them.
+
+They hallucinate. They get prompt-injected. They break constraints silently. And yet, we hand them real-world decisions -- financial approvals, infrastructure changes, customer-facing actions -- and hope for the best.
+
+Hope is not a runtime strategy.
+
+## The Solution
+
+Chimera is a **deterministic execution layer** that sits between your AI agent and the real world.
+
+Not a wrapper. Not a filter. Not another prompt engineering trick.
+
+A **runtime** that enforces constraints *outside* the model, verifies policies with **formal logic (Z3)**, and **blocks invalid actions before they happen**.
+
+Every decision is: **Checked. Proven. Enforced.**
 
 ```
-Agent Action --> Policy Guard --> BLOCK / ALLOW / ASK_HUMAN --> Audit Record
-                    |
-              Violation report + EU AI Act compliant audit trail
+Agent Intent → Constraint Guard → ALLOW / BLOCK / ASK_HUMAN → Audit Record
 ```
 
-**Why?** AI agents in enterprise are hard to audit and hard to control. chimera-compliance solves this by binding agents to a deterministic runtime guard -- every tool call, every decision goes through policy evaluation before execution.
+No exceptions. No bypass. No "the model said it was fine."
 
-**Key properties:**
-
-- **Deterministic safety** -- Policy constraints enforced via rules (or Z3 formal verification with CSL-Core)
-- **Framework agnostic** -- Works with LangChain, LangGraph, LlamaIndex, CrewAI, AutoGen, or raw LLMs
-- **Full audit trail** -- Every decision produces a complete JSON record (Art. 12)
-- **Human oversight** -- Confirm, override, or halt at any point (Art. 14)
-- **Right to explanation** -- One-click HTML reports for any decision (Art. 86)
+---
 
 ## Quickstart
 
-### Install
-
 ```bash
-# Core (YAML rules, no Z3)
-pip install chimera-compliance
+pip install chimera-runtime
 
-# With CSL-Core for Z3 formal verification (recommended)
-pip install chimera-compliance[csl]
-
-# Everything
-pip install chimera-compliance[all]
+chimera-runtime init
+chimera-runtime run
 ```
 
-### Initialize a project
+Three commands. Your agent is now constrained.
 
-```bash
-chimera-compliance init
-```
+---
 
-This creates `.chimera/config.yaml` and a starter policy file.
+## Define Constraints
 
-### Write a policy
+Two paths. Same enforcement.
 
-**Option A: YAML rules (no extra dependencies)**
+### Option A: YAML Rules (zero dependencies)
 
 ```yaml
 # policies/governance.yaml
@@ -87,7 +85,7 @@ rules:
     message: "No changes on weekends unless critical"
 ```
 
-**Option B: CSL policy (requires `chimera-compliance[csl]`)**
+### Option B: CSL with Z3 Formal Verification (recommended)
 
 ```text
 CONFIG {
@@ -107,59 +105,26 @@ DOMAIN GovernanceGuard {
 }
 ```
 
-### Run the agent
+YAML gives you rules. CSL gives you **mathematical proof** that your constraints are consistent, reachable, and conflict-free -- before a single agent runs.
 
 ```bash
-export CHIMERA_OPENAI_API_KEY=sk-...
-chimera-compliance run
+chimera-runtime verify policies/governance.csl
 ```
 
-### Verify a policy
+---
 
-```bash
-chimera-compliance verify policies/governance.csl
-```
+## Framework Integrations
 
-## Dashboard
-
-**chimera-compliance** comes with a full-featured compliance dashboard at **[compliance.chimera-protocol.com](https://compliance.chimera-protocol.com)**.
-
-<p align="center">
-  <img src=".github/dashboard.png" alt="Dashboard — Real-time audit monitoring" width="800">
-</p>
-
-**Real-time audit monitoring** -- Live feed of agent decisions with ALLOW/BLOCK/ESCALATE status, EU AI Act compliance score, and top violations.
-
-<p align="center">
-  <img src=".github/policy.png" alt="Policy Management" width="800">
-</p>
-
-**Policy management** -- Create, edit, and verify CSL/YAML policies with Z3 formal verification. View constraints, variables, and policy hashes.
-
-<p align="center">
-  <img src=".github/analytics.png" alt="Analytics" width="800">
-</p>
-
-**Analytics** -- Decision trends, block rate heatmaps, and violation frequency across all agents.
-
-<p align="center">
-  <img src=".github/framework.png" alt="Connect Agent Wizard" width="800">
-</p>
-
-**Connect Agent** -- 4-step wizard to integrate compliance guard into LangChain, LangGraph, CrewAI, LlamaIndex, or AutoGen.
-
-## Agent Framework Integrations
+Chimera drops into whatever you're already using. No rewrites.
 
 ### LangChain
 
 ```python
 from langchain_openai import ChatOpenAI
-from chimera_compliance.integrations.langchain import wrap_tools, ChimeraCallbackHandler
+from chimera_runtime.integrations.langchain import wrap_tools, ChimeraCallbackHandler
 
-# Wrap your tools with compliance guard
 guarded_tools = wrap_tools(your_tools, policy="./policies/governance.yaml")
 
-# Or use callback handler
 handler = ChimeraCallbackHandler(policy="./policies/governance.yaml")
 llm = ChatOpenAI(callbacks=[handler])
 ```
@@ -167,24 +132,23 @@ llm = ChatOpenAI(callbacks=[handler])
 ### LangGraph
 
 ```python
-from chimera_compliance.integrations.langgraph import compliance_node
+from chimera_runtime.integrations.langgraph import compliance_node
 
-# Add a compliance gate node to your graph
-graph.add_node("compliance_check", compliance_node(policy="./policies/governance.yaml"))
+graph.add_node("constraint_gate", compliance_node(policy="./policies/governance.yaml"))
 ```
 
 ### CrewAI
 
 ```python
-from chimera_compliance.integrations.crewai import wrap_crew_tools
+from chimera_runtime.integrations.crewai import wrap_crew_tools
 
 guarded_tools = wrap_crew_tools(your_tools, policy="./policies/governance.yaml")
 ```
 
-### Raw LLM (direct)
+### Direct Usage
 
 ```python
-from chimera_compliance import ChimeraAgent
+from chimera_runtime import ChimeraAgent
 
 agent = ChimeraAgent(
     model="gpt-4o",
@@ -201,69 +165,124 @@ print(result.result)       # "ALLOWED"
 print(result.action)       # "Allocate $200k to digital channels"
 ```
 
+Every tool call. Every decision. Through the constraint guard. No exceptions.
+
+---
+
+## Dashboard
+
+Full runtime control plane at **[compliance.chimera-protocol.com](https://runtime.chimera-protocol.com)**.
+
+<p align="center">
+  <img src=".github/dashboard.png" alt="Real-time decision enforcement" width="800">
+</p>
+
+**Real-time decision enforcement** -- Live feed of every ALLOW, BLOCK, and ESCALATE. See exactly what your agents are doing and what they're being stopped from doing.
+
+<p align="center">
+  <img src=".github/policy.png" alt="Policy management with formal verification" width="800">
+</p>
+
+**Policy management with formal verification** -- Write, edit, and verify CSL policies. Z3 proves correctness before deployment. No untested constraints reach production.
+
+<p align="center">
+  <img src=".github/analytics.png" alt="Decision analytics" width="800">
+</p>
+
+**Decision analytics & block rate heatmaps** -- What's getting blocked, when, and why. Patterns across agents, frameworks, and time.
+
+<p align="center">
+  <img src=".github/framework.png" alt="Framework integration wizard" width="800">
+</p>
+
+**Framework integration wizard** -- Four steps to wire Chimera into LangChain, LangGraph, CrewAI, LlamaIndex, or AutoGen.
+
+---
+
+## How It Works
+
+```
+1. Define constraints in CSL
+2. Z3 verifies correctness (reachability, consistency, conflict-freedom)
+3. Runtime enforces at execution time
+```
+
+The model never sees the constraints. The model never evaluates the constraints. The model's opinion on whether it should be allowed to do something is **irrelevant**.
+
+Constraints live outside the model. Enforcement happens outside the model. The model is a generator. Chimera is the governor.
+
+---
+
 ## CLI Reference
 
 | Command | Description |
 |---------|-------------|
-| `chimera-compliance init` | Initialize project with config and starter policy |
-| `chimera-compliance run` | Interactive agent with real-time reasoning display |
-| `chimera-compliance run --daemon` | Pipe mode for JSON stdin/stdout |
-| `chimera-compliance stop [--force]` | Graceful or immediate halt |
-| `chimera-compliance verify [POLICY]` | Verify CSL policy (syntax + Z3 + IR) |
-| `chimera-compliance test [--skip-llm]` | End-to-end system test |
-| `chimera-compliance audit --stats` | Aggregate decision statistics |
-| `chimera-compliance audit --last 10` | Recent decisions table |
-| `chimera-compliance audit --export FILE` | Export records (json/compact/stats) |
-| `chimera-compliance policy new NAME` | Create policy from template |
-| `chimera-compliance policy list` | List and verify all policies |
-| `chimera-compliance policy simulate FILE '{"k":"v"}'` | Test policy against input |
-| `chimera-compliance explain --id ID` | Generate Art. 86 HTML explanation |
-| `chimera-compliance docs generate` | Generate Annex IV documentation |
-| `chimera-compliance license status` | Show current license tier and details |
-| `chimera-compliance license activate KEY` | Activate a license |
-| `chimera-compliance license deactivate` | Remove license key |
+| `chimera-runtime init` | Initialize project with config and starter policy |
+| `chimera-runtime run` | Interactive agent with real-time constraint enforcement |
+| `chimera-runtime run --daemon` | Pipe mode for JSON stdin/stdout |
+| `chimera-runtime stop [--force]` | Graceful or immediate halt |
+| `chimera-runtime verify [POLICY]` | Verify CSL policy (syntax + Z3 + IR) |
+| `chimera-runtime test [--skip-llm]` | End-to-end system test |
+| `chimera-runtime audit --stats` | Aggregate decision statistics |
+| `chimera-runtime audit --last 10` | Recent decisions table |
+| `chimera-runtime audit --export FILE` | Export records (json/compact/stats) |
+| `chimera-runtime policy new NAME` | Create policy from template |
+| `chimera-runtime policy list` | List and verify all policies |
+| `chimera-runtime policy simulate FILE '{"k":"v"}'` | Test policy against input |
+| `chimera-runtime explain --id ID` | Generate Art. 86 HTML explanation |
+| `chimera-runtime docs generate` | Generate technical documentation |
+| `chimera-runtime license status` | Show current license tier |
+| `chimera-runtime license activate KEY` | Activate a license |
+| `chimera-runtime license deactivate` | Remove license key |
 
-## EU AI Act Compliance
+---
 
-| Article | Requirement | Implementation |
-|---------|-------------|----------------|
-| Art. 9 | Risk management | Formal verification (Z3) or rule-based policy evaluation |
-| Art. 12 | Record-keeping | Complete DecisionAuditRecord for every decision |
-| Art. 13 | Transparency | Right to explanation, audit queries, HTML reports |
-| Art. 14 | Human oversight | Confirm/override/halt with full audit trail |
-| Art. 15 | Accuracy & security | Deterministic policy gate, API key protection |
+## EU AI Act
+
+Compliance is a consequence -- not the product.
+
+When you enforce deterministic constraints, maintain complete audit trails, and provide human oversight by design, you don't need to bolt on compliance after the fact. You already have it.
+
+| Article | Requirement | How Chimera Delivers It |
+|---------|-------------|------------------------|
+| Art. 9 | Risk management | Formal verification (Z3) proves policy correctness before deployment |
+| Art. 12 | Record-keeping | Complete DecisionAuditRecord for every decision, automatically |
+| Art. 13 | Transparency | Full decision explanations, audit queries, HTML reports |
+| Art. 14 | Human oversight | ASK_HUMAN escalation, confirm/override/halt with audit trail |
+| Art. 15 | Accuracy & security | Deterministic constraint gate -- not probabilistic filtering |
 | Art. 19 | Retention | Configurable retention with automatic enforcement |
 | Art. 86 | Right to explanation | Self-contained HTML reports per decision |
-| Annex IV | Technical documentation | Auto-generated 14/19 sections |
+| Annex IV | Technical documentation | Auto-generated (14/19 sections) |
 
-## Supported Providers & Frameworks
+---
+
+## Supported Frameworks & Providers
 
 | Integration | Install | Notes |
 |-------------|---------|-------|
-| LangChain | `pip install chimera-compliance[langchain]` | Tool wrapper + callback handler |
-| LangGraph | `pip install chimera-compliance[langgraph]` | Node guard + state checkpoint |
-| LlamaIndex | `pip install chimera-compliance[llamaindex]` | Tool spec + callback handler |
-| CrewAI | `pip install chimera-compliance[crewai]` | Tool wrapper for crews |
-| AutoGen | `pip install chimera-compliance[autogen]` | Agent wrapper |
-| OpenAI | `pip install chimera-compliance[openai]` | gpt-4o, gpt-4o-mini, o1, o3 |
-| Anthropic | `pip install chimera-compliance[anthropic]` | claude-sonnet-4-20250514, claude-opus-4-20250514 |
-| Google | `pip install chimera-compliance[google]` | gemini-2.0-flash, gemini-2.5-pro |
-| Ollama | `pip install chimera-compliance[ollama]` | llama3, mistral, qwen (local) |
-| CSL-Core | `pip install chimera-compliance[csl]` | Z3 formal verification |
+| LangChain | `pip install chimera-runtime[langchain]` | Tool wrapper + callback handler |
+| LangGraph | `pip install chimera-runtime[langgraph]` | Node guard + state checkpoint |
+| LlamaIndex | `pip install chimera-runtime[llamaindex]` | Tool spec + callback handler |
+| CrewAI | `pip install chimera-runtime[crewai]` | Tool wrapper for crews |
+| AutoGen | `pip install chimera-runtime[autogen]` | Agent wrapper |
+| OpenAI | `pip install chimera-runtime[openai]` | gpt-4o, gpt-4o-mini, o1, o3 |
+| Anthropic | `pip install chimera-runtime[anthropic]` | claude-sonnet-4-20250514, claude-opus-4-20250514 |
+| Google | `pip install chimera-runtime[google]` | gemini-2.0-flash, gemini-2.5-pro |
+| Ollama | `pip install chimera-runtime[ollama]` | llama3, mistral, qwen (local) |
+| CSL-Core | `pip install chimera-runtime[csl]` | Z3 formal verification engine |
+
+---
 
 ## Development
 
 ```bash
-git clone https://github.com/akarlaraytu/chimera-compliance
-cd chimera-compliance
+git clone https://github.com/akarlaraytu/chimera-runtime
+cd chimera-runtime
 pip install -e ".[dev,all]"
 pytest tests/ -v
 ```
 
-## Related Projects
-
-- **[CSL-Core](https://pypi.org/project/csl-core/)** -- Chimera Specification Language compiler and runtime
-- **[Chimera Compliance Dashboard](https://compliance.chimera-protocol.com)** -- EU AI Act compliance dashboard
+---
 
 ## License
 
@@ -272,6 +291,6 @@ Apache License 2.0 -- see [LICENSE](LICENSE) for details.
 ---
 
 <p align="center">
-  <strong>Building AI Governance.</strong><br>
+  <strong>LLMs generate. Chimera governs.</strong><br>
   <sub>Built by <a href="https://github.com/akarlaraytu">Aytug Akarlar</a></sub>
 </p>
