@@ -258,7 +258,7 @@ class Violation:
     @classmethod
     def from_dict(cls, d: Dict[str, Any]) -> Violation:
         return cls(
-            constraint=d["constraint"],
+            constraint=d.get("constraint", "unknown"),
             rule=d.get("rule", ""),
             trigger_values=d.get("trigger_values", {}),
             explanation=d.get("explanation", ""),
@@ -289,10 +289,10 @@ class PolicyEvaluation:
     @classmethod
     def from_dict(cls, d: Dict[str, Any]) -> PolicyEvaluation:
         return cls(
-            policy_file=d["policy_file"],
-            policy_hash=d["policy_hash"],
-            result=d["result"],
-            duration_ms=float(d["duration_ms"]),
+            policy_file=d.get("policy_file", ""),
+            policy_hash=d.get("policy_hash", ""),
+            result=d.get("result", "ALLOWED"),
+            duration_ms=float(d.get("duration_ms", 0.0)),
             violations=[Violation.from_dict(v) for v in d.get("violations", [])],
         )
 
@@ -325,8 +325,8 @@ class Candidate:
     def from_dict(cls, d: Dict[str, Any]) -> Candidate:
         pe = d.get("policy_evaluation")
         return cls(
-            candidate_id=d["candidate_id"],
-            strategy=d["strategy"],
+            candidate_id=d.get("candidate_id", d.get("candidate_index", "cand_000")),
+            strategy=d.get("strategy", ""),
             llm_reasoning=d.get("llm_reasoning", ""),
             llm_confidence=float(d.get("llm_confidence", 0.0)),
             parameters=d.get("parameters", {}),
@@ -356,9 +356,9 @@ class Attempt:
     @classmethod
     def from_dict(cls, d: Dict[str, Any]) -> Attempt:
         return cls(
-            attempt_number=int(d["attempt_number"]),
+            attempt_number=int(d.get("attempt_number", 1)),
             candidates=[Candidate.from_dict(c) for c in d.get("candidates", [])],
-            outcome=d["outcome"],
+            outcome=d.get("outcome", "ALL_PASSED"),
             note=d.get("note", ""),
         )
 
@@ -389,11 +389,11 @@ class AgentInfo:
     @classmethod
     def from_dict(cls, d: Dict[str, Any]) -> AgentInfo:
         return cls(
-            name=d["name"],
-            version=d["version"],
+            name=d.get("name", "unknown"),
+            version=d.get("version", "0.0.0"),
             csl_core_version=d.get("csl_core_version", "unknown"),
-            model=d["model"],
-            model_provider=d["model_provider"],
+            model=d.get("model", "unknown"),
+            model_provider=d.get("model_provider", d.get("provider", "unknown")),
             temperature=float(d.get("temperature", 0.0)),
         )
 
@@ -417,7 +417,7 @@ class InputInfo:
     @classmethod
     def from_dict(cls, d: Dict[str, Any]) -> InputInfo:
         return cls(
-            raw_request=d["raw_request"],
+            raw_request=d.get("raw_request", d.get("request", "")),
             structured_params=d.get("structured_params", {}),
             context=d.get("context", {}),
         )
@@ -446,8 +446,8 @@ class ReasoningTrace:
     @classmethod
     def from_dict(cls, d: Dict[str, Any]) -> ReasoningTrace:
         return cls(
-            total_candidates=int(d["total_candidates"]),
-            total_attempts=int(d["total_attempts"]),
+            total_candidates=int(d.get("total_candidates", 0)),
+            total_attempts=int(d.get("total_attempts", 0)),
             attempts=[Attempt.from_dict(a) for a in d.get("attempts", [])],
             selected_candidate=d.get("selected_candidate"),
             selection_reasoning=d.get("selection_reasoning", ""),
@@ -477,11 +477,11 @@ class DecisionInfo:
     @classmethod
     def from_dict(cls, d: Dict[str, Any]) -> DecisionInfo:
         return cls(
-            action_taken=d["action_taken"],
-            result=d["result"],
+            action_taken=d.get("action_taken", ""),
+            result=d.get("result", "ALLOWED"),
             final_parameters=d.get("final_parameters", {}),
-            policy_file=d["policy_file"],
-            policy_hash=d["policy_hash"],
+            policy_file=d.get("policy_file", ""),
+            policy_hash=d.get("policy_hash", ""),
         )
 
 
@@ -690,15 +690,15 @@ class DecisionAuditRecord:
         """Deserialize from JSON-ready dict."""
         hor = d.get("human_oversight_record")
         return cls(
-            schema_version=d["schema_version"],
-            decision_id=d["decision_id"],
-            timestamp=d["timestamp"],
-            agent=AgentInfo.from_dict(d["agent"]),
-            input=InputInfo.from_dict(d["input"]),
-            reasoning=ReasoningTrace.from_dict(d["reasoning"]),
-            decision=DecisionInfo.from_dict(d["decision"]),
-            compliance=ComplianceInfo.from_dict(d["compliance"]),
-            performance=PerformanceInfo.from_dict(d["performance"]),
+            schema_version=d.get("schema_version", "1.0.0"),
+            decision_id=d.get("decision_id", "unknown"),
+            timestamp=d.get("timestamp", ""),
+            agent=AgentInfo.from_dict(d.get("agent", {})),
+            input=InputInfo.from_dict(d.get("input", {})),
+            reasoning=ReasoningTrace.from_dict(d.get("reasoning", {})),
+            decision=DecisionInfo.from_dict(d.get("decision", {})),
+            compliance=ComplianceInfo.from_dict(d.get("compliance", {})),
+            performance=PerformanceInfo.from_dict(d.get("performance", {})),
             human_oversight_record=HumanOversightRecord.from_dict(hor) if hor else None,
         )
 
