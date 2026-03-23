@@ -24,7 +24,7 @@ export function StatsCards({ stats, loading }: StatsCardsProps) {
       icon: ShieldCheck,
       color: "text-[#22c55e]",
       bg: "bg-[#22c55e]/10",
-      sub: stats ? `${(stats.allow_rate * 100).toFixed(1)}%` : undefined,
+      sub: stats ? `${((stats.allow_rate ?? 0) * 100).toFixed(1)}%` : undefined,
     },
     {
       label: "Blocked",
@@ -32,11 +32,11 @@ export function StatsCards({ stats, loading }: StatsCardsProps) {
       icon: ShieldX,
       color: "text-[#ef4444]",
       bg: "bg-[#ef4444]/10",
-      sub: stats ? `${(stats.block_rate * 100).toFixed(1)}%` : undefined,
+      sub: stats ? `${((stats.block_rate ?? 0) * 100).toFixed(1)}%` : undefined,
     },
     {
       label: "Avg Latency",
-      value: stats ? `${stats.avg_duration_ms.toFixed(1)}ms` : "0ms",
+      value: stats ? `${(stats.avg_duration_ms ?? stats.avg_latency_ms ?? 0).toFixed(1)}ms` : "0ms",
       icon: Clock,
       color: "text-[#f59e0b]",
       bg: "bg-[#f59e0b]/10",

@@ -77,7 +77,7 @@ export function RecentDecisions({ decisions, loading }: RecentDecisionsProps) {
                 </div>
                 <div className="flex items-center gap-4 shrink-0">
                   <span className="text-xs text-[#71717a] font-mono">
-                    {d.duration_ms.toFixed(1)}ms
+                    {(d.duration_ms ?? 0).toFixed(1)}ms
                   </span>
                   <span className="text-xs text-[#71717a]">
                     {formatTime(d.timestamp)}

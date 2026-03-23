@@ -129,6 +129,7 @@ export interface AuditStats {
   block_rate: number;
   allow_rate: number;
   avg_duration_ms: number;
+  avg_latency_ms: number;
   avg_candidates_per_decision: number;
   avg_attempts_per_decision: number;
   total_violations: number;
