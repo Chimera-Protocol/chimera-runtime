@@ -45,6 +45,11 @@ const navItems: NavItem[] = [
     icon: FileText,
   },
   {
+    label: "Learn CSL",
+    href: "/learn-csl",
+    icon: BookOpen,
+  },
+  {
     label: "Analytics",
     href: "/analytics",
     icon: BarChart3,

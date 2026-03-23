@@ -180,6 +180,101 @@ _SCENARIOS = [
     },
 ]
 
+_DEMO_AGENT_GUARD_CSL = """\
+CONFIG {
+  ENFORCEMENT_MODE: BLOCK
+  CHECK_LOGICAL_CONSISTENCY: TRUE
+}
+
+DOMAIN AgentToolGuard {
+  VARIABLES {
+    user_role: {"ADMIN", "USER", "ANALYST"}
+    tool: {"SEND_EMAIL", "TRANSFER_FUNDS", "QUERY_DB", "DELETE_RECORD"}
+    amount: 0..100000
+    recipient_domain: {"INTERNAL", "EXTERNAL"}
+    pii_present: {"YES", "NO"}
+    approval_token: {"YES", "NO"}
+  }
+
+  // Non-admin users cannot perform money transfers
+  STATE_CONSTRAINT non_admin_no_transfer {
+    WHEN user_role == "USER" OR user_role == "ANALYST"
+    THEN tool MUST NOT BE "TRANSFER_FUNDS"
+  }
+
+  // Admin transfers require explicit approval
+  STATE_CONSTRAINT transfer_requires_approval {
+    WHEN tool == "TRANSFER_FUNDS" AND user_role == "ADMIN"
+    THEN approval_token == "YES"
+  }
+
+  // Hard transfer limit per action
+  STATE_CONSTRAINT admin_transfer_limit {
+    WHEN tool == "TRANSFER_FUNDS" AND user_role == "ADMIN"
+    THEN amount <= 5000
+  }
+
+  // PII data cannot be emailed externally
+  STATE_CONSTRAINT no_external_email_with_pii {
+    WHEN tool == "SEND_EMAIL" AND pii_present == "YES"
+    THEN recipient_domain MUST NOT BE "EXTERNAL"
+  }
+
+  // DELETE_RECORD is always forbidden
+  STATE_CONSTRAINT no_delete_record_tool {
+    ALWAYS True
+    THEN tool MUST NOT BE "DELETE_RECORD"
+  }
+}
+"""
+
+_DEMO_CONTENT_POLICY_CSL = """\
+CONFIG {
+  ENFORCEMENT_MODE: BLOCK
+  CHECK_LOGICAL_CONSISTENCY: TRUE
+}
+
+DOMAIN ContentGuard {
+  VARIABLES {
+    user_age: 0..120
+    category: {"GENERAL", "TEEN", "MATURE", "RESTRICTED"}
+    verified_identity: {"YES", "NO"}
+    content_risk_score: 0..100
+    region: {"US", "EU", "APAC"}
+  }
+
+  // Minors cannot access mature content
+  STATE_CONSTRAINT no_mature_for_minors {
+    WHEN user_age < 18
+    THEN category MUST NOT BE "MATURE"
+  }
+
+  // Minors cannot access restricted content
+  STATE_CONSTRAINT no_restricted_for_minors {
+    WHEN user_age < 18
+    THEN category MUST NOT BE "RESTRICTED"
+  }
+
+  // Restricted content requires identity verification
+  STATE_CONSTRAINT restricted_requires_verification {
+    WHEN category == "RESTRICTED" AND user_age >= 18
+    THEN verified_identity MUST BE "YES"
+  }
+
+  // High risk content blocked for all
+  STATE_CONSTRAINT block_high_risk {
+    WHEN content_risk_score > 85
+    THEN category MUST NOT BE "RESTRICTED"
+  }
+
+  // EU region has stricter age limit for TEEN content
+  STATE_CONSTRAINT eu_teen_restriction {
+    WHEN region == "EU" AND user_age < 16
+    THEN category MUST NOT BE "TEEN"
+  }
+}
+"""
+
 _DEMO_FINANCE_CSL = """\
 CONFIG {
   ENFORCEMENT_MODE: BLOCK
@@ -410,6 +505,15 @@ async def load_demo_data(user: dict = Depends(get_current_user)):
     if not demo_policy_path.exists():
         demo_policy_path.write_text(_DEMO_FINANCE_CSL)
         policies_created += 1
+
+    for demo_name, demo_content in [
+        ("demo_agent_guard.csl", _DEMO_AGENT_GUARD_CSL),
+        ("demo_content_policy.csl", _DEMO_CONTENT_POLICY_CSL),
+    ]:
+        demo_path = user_policies_path / demo_name
+        if not demo_path.exists():
+            demo_path.write_text(demo_content)
+            policies_created += 1
 
     # Global governance.csl is always visible to all users
     if (policies_path / "governance.csl").exists():

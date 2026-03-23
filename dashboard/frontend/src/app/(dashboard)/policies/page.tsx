@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import Link from "next/link";
 import { api } from "@/lib/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -23,8 +25,10 @@ import {
   FlaskConical,
   AlertTriangle,
   Info,
+  Sparkles,
 } from "lucide-react";
 import { ProGate } from "@/components/pro-gate";
+import { PolicyMarketplace } from "@/components/policies/PolicyMarketplace";
 import type { PolicySummary, PolicyDetail, VerificationResult } from "@/lib/types";
 
 // ── CSL/YAML Templates ────────────────────────────────────────────
@@ -241,11 +245,37 @@ export default function PoliciesPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-white">Policies</h1>
-        <p className="mt-1 text-sm text-[#71717a]">
-          Manage, verify, and create compliance policies
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-white">Policies</h1>
+          <p className="mt-1 text-sm text-[#71717a]">
+            Manage, verify, and create compliance policies
+          </p>
+        </div>
+        <Link href="/learn-csl">
+          <motion.div
+            className="relative inline-flex items-center gap-2 px-5 py-2.5 rounded-xl
+                       bg-gradient-to-r from-indigo-500/10 to-purple-500/10
+                       border border-indigo-500/30 text-indigo-300 text-sm font-medium
+                       hover:border-indigo-400/50 transition-colors cursor-pointer"
+            animate={{
+              boxShadow: [
+                "0 0 20px rgba(99,102,241,0.15)",
+                "0 0 40px rgba(99,102,241,0.3)",
+                "0 0 20px rgba(99,102,241,0.15)",
+              ],
+            }}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
+            <Sparkles className="h-4 w-4 text-indigo-400" />
+            How to Write Policies in CSL
+            <motion.span
+              className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-indigo-400"
+              animate={{ scale: [1, 1.5, 1], opacity: [1, 0.5, 1] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+            />
+          </motion.div>
+        </Link>
       </div>
 
       <Tabs defaultValue="manage" className="w-full">
@@ -261,6 +291,10 @@ export default function PoliciesPage() {
           <TabsTrigger value="simulate" className="data-[state=active]:bg-[#6366f1]/10 data-[state=active]:text-[#818cf8]">
             <FlaskConical className="mr-2 h-4 w-4" />
             Simulate
+          </TabsTrigger>
+          <TabsTrigger value="marketplace" className="data-[state=active]:bg-[#6366f1]/10 data-[state=active]:text-[#818cf8]">
+            <Sparkles className="mr-2 h-4 w-4" />
+            Marketplace
           </TabsTrigger>
         </TabsList>
 
@@ -752,6 +786,11 @@ export default function PoliciesPage() {
               </CardContent>
             </Card>
           </ProGate>
+        </TabsContent>
+
+        {/* ══════════════ TAB 4: Marketplace ══════════════ */}
+        <TabsContent value="marketplace" className="mt-6">
+          <PolicyMarketplace />
         </TabsContent>
       </Tabs>
     </div>
