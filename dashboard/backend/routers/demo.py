@@ -400,16 +400,18 @@ async def load_demo_data(user: dict = Depends(get_current_user)):
     for rec in records:
         _storage.save(user_id, rec)
 
-    # Write demo finance policy if it doesn't exist
+    # Write demo finance policy to user's policy directory
     policies_created = 0
     policies_path = Path(_policies_dir)
-    demo_policy_path = policies_path / "demo_finance.csl"
+    user_policies_path = policies_path / str(user_id)
+    user_policies_path.mkdir(parents=True, exist_ok=True)
+
+    demo_policy_path = user_policies_path / "demo_finance.csl"
     if not demo_policy_path.exists():
-        policies_path.mkdir(parents=True, exist_ok=True)
         demo_policy_path.write_text(_DEMO_FINANCE_CSL)
         policies_created += 1
 
-    # governance.csl should already exist; count it if present
+    # Global governance.csl is always visible to all users
     if (policies_path / "governance.csl").exists():
         policies_created += 1
 
@@ -437,15 +439,10 @@ async def reset_demo_data(user: dict = Depends(get_current_user)):
         if decision_id:
             _storage.delete(user_id, decision_id)
 
-    # Reload fresh demo data
-    records = _generate_demo_records(15)
-    for rec in records:
-        _storage.save(user_id, rec)
-
     return {
         "status": "ok",
         "records_cleared": records_cleared,
-        "records_created": len(records),
+        "records_created": 0,
     }
 
 

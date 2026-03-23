@@ -1,17 +1,22 @@
 """
 Policies API Router — /api/v1/policies/*
 
-Wraps chimera_runtime's PolicyManager for the dashboard.
+Hybrid policy model:
+  - Global policies: shared read-only templates
+  - User policies: per-user custom policies
+
+Users see both. Create/edit only affects user's own policies.
 """
 
 from __future__ import annotations
 
 from typing import Any, Dict, Optional
 
-from fastapi import APIRouter, HTTPException, Body, Request
+from fastapi import APIRouter, HTTPException, Body, Depends, Request
 from fastapi.responses import PlainTextResponse
 from pydantic import BaseModel
 
+from ..middleware.auth import get_current_user, get_optional_user
 from ..models.api_key import verify_api_key
 from ..services.policy_service import PolicyService
 
@@ -37,28 +42,31 @@ def get_service() -> PolicyService:
 
 
 @router.get("")
-async def list_policies():
-    """List all policy files with summary info."""
+async def list_policies(user: Optional[dict] = Depends(get_optional_user)):
+    """List all policy files: global templates + user's custom policies."""
     svc = get_service()
-    return {"policies": svc.list_policies()}
+    user_id = user["id"] if user else None
+    return {"policies": svc.list_policies(user_id=user_id)}
 
 
 @router.get("/{filename}")
-async def get_policy(filename: str):
+async def get_policy(filename: str, user: Optional[dict] = Depends(get_optional_user)):
     """Get detailed policy information: constraints, variables, domains."""
     svc = get_service()
+    user_id = user["id"] if user else None
     try:
-        return svc.get_policy(filename)
+        return svc.get_policy(filename, user_id=user_id)
     except Exception as e:
         raise HTTPException(404, f"Policy not found: {filename}")
 
 
 @router.post("/{filename}/verify")
-async def verify_policy(filename: str):
+async def verify_policy(filename: str, user: Optional[dict] = Depends(get_optional_user)):
     """Run Z3 formal verification (CSL) or syntax validation (YAML)."""
     svc = get_service()
+    user_id = user["id"] if user else None
     try:
-        return svc.verify_policy(filename)
+        return svc.verify_policy(filename, user_id=user_id)
     except Exception as e:
         raise HTTPException(400, f"Verification failed: {e}")
 
@@ -67,21 +75,24 @@ async def verify_policy(filename: str):
 async def simulate_policy(
     filename: str,
     parameters: Dict[str, Any] = Body(..., description="Parameters to evaluate"),
+    user: Optional[dict] = Depends(get_optional_user),
 ):
-    """Simulate policy evaluation against given parameters. [Pro+]"""
+    """Simulate policy evaluation against given parameters."""
     svc = get_service()
+    user_id = user["id"] if user else None
     try:
-        return svc.simulate_policy(filename, parameters)
+        return svc.simulate_policy(filename, parameters, user_id=user_id)
     except Exception as e:
         raise HTTPException(400, f"Simulation failed: {e}")
 
 
 @router.get("/{filename}/content")
-async def get_policy_content(filename: str):
+async def get_policy_content(filename: str, user: Optional[dict] = Depends(get_optional_user)):
     """Get raw policy file source content for the editor."""
     svc = get_service()
+    user_id = user["id"] if user else None
     try:
-        return svc.get_policy_content(filename)
+        return svc.get_policy_content(filename, user_id=user_id)
     except Exception as e:
         raise HTTPException(404, str(e))
 
@@ -92,11 +103,31 @@ class CreatePolicyRequest(BaseModel):
 
 
 @router.post("")
-async def create_policy(body: CreatePolicyRequest):
-    """Create a new policy file (CSL or YAML)."""
+async def create_policy(body: CreatePolicyRequest, user: dict = Depends(get_current_user)):
+    """Create a new policy file in user's workspace."""
     svc = get_service()
     try:
-        return svc.create_policy(body.filename, body.content)
+        return svc.create_policy(body.filename, body.content, user_id=user["id"])
+    except Exception as e:
+        raise HTTPException(400, str(e))
+
+
+@router.post("/{filename}/fork")
+async def fork_policy(filename: str, user: dict = Depends(get_current_user)):
+    """Copy a global policy to your workspace for customization."""
+    svc = get_service()
+    try:
+        return svc.copy_global_to_user(filename, user["id"])
+    except Exception as e:
+        raise HTTPException(400, str(e))
+
+
+@router.delete("/{filename}")
+async def delete_policy(filename: str, user: dict = Depends(get_current_user)):
+    """Delete a custom policy from your workspace. Cannot delete global policies."""
+    svc = get_service()
+    try:
+        return svc.delete_user_policy(filename, user["id"])
     except Exception as e:
         raise HTTPException(400, str(e))
 
