@@ -175,14 +175,24 @@ class AuditService:
                         for v in c.policy_evaluation.violations:
                             violations[v.constraint] = violations.get(v.constraint, 0) + 1
 
+        allow_rate = round(allowed / total, 4) if total > 0 else 0
+        block_rate_val = round(blocked / total, 4) if total > 0 else 0
+
         return {
             "total_decisions": total,
             "allowed": allowed,
+            "allowed_count": allowed,
             "blocked": blocked,
+            "blocked_count": blocked,
             "human_overrides": overrides,
+            "human_override_count": overrides,
             "interrupted": interrupted,
-            "block_rate": round(blocked / total, 4) if total > 0 else 0,
+            "interrupted_count": interrupted,
+            "allow_rate": allow_rate,
+            "block_rate": block_rate_val,
             "avg_latency_ms": round(avg_latency, 2),
+            "avg_duration_ms": round(avg_latency, 2),
+            "total_violations": sum(violations.values()),
             "top_violations": sorted(violations.items(), key=lambda x: -x[1])[:5],
             "last_days": last_days,
         }
