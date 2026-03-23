@@ -22,7 +22,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import Response
 
 from .config import DashboardConfig
-from .routers import audit, policies, analytics, compliance, auth, docs, settings, agents, leads, license, ingest, wallet
+from .routers import audit, policies, analytics, compliance, auth, docs, settings, agents, leads, license, ingest, wallet, demo
 from .models.user import create_tables
 from .models.api_key import create_api_keys_table
 from .models.wallet import create_wallet_tables
@@ -80,6 +80,7 @@ async def lifespan(app: FastAPI):
     leads.init_service(db_path)
     ingest.init_service(storage, db_path)
     wallet.init_service(db_path)
+    demo.init_service(storage, db_path, policies_dir)
 
     print(f"  Dashboard backend started")
     print(f"  Storage:      {config.storage_backend}" + (f" (s3://{config.s3_bucket})" if config.storage_backend == "s3" else f" ({audit_dir})"))
@@ -138,6 +139,7 @@ app.include_router(agents.router, prefix="/api/v1")
 app.include_router(leads.router, prefix="/api/v1")
 app.include_router(ingest.router, prefix="/api/v1")
 app.include_router(wallet.router, prefix="/api/v1")
+app.include_router(demo.router, prefix="/api/v1")
 app.include_router(license.router)
 
 

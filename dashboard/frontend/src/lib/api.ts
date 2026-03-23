@@ -288,6 +288,22 @@ export const api = {
     fetchApi<{ leads: Array<{ id: number; email: string; name: string; company: string; plan: string; message: string; created_at: string }>; total: number }>(
       "/leads"
     ),
+
+  // ── Demo Data ─────────────────────────────────────────────────────
+  loadDemoData: () =>
+    fetchApi<{ status: string; records_created: number; policies_created: number }>(
+      "/demo/load",
+      { method: "POST" }
+    ),
+
+  resetDemoData: () =>
+    fetchApi<{ status: string; records_cleared: number; records_created: number }>(
+      "/demo/reset",
+      { method: "POST" }
+    ),
+
+  getDemoStatus: () =>
+    fetchApi<{ has_demo_data: boolean; record_count: number }>("/demo/status"),
 };
 
 export default api;
