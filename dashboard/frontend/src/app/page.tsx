@@ -21,6 +21,8 @@ import {
   Terminal,
   ChevronRight,
   Play,
+  Code2,
+  Rocket,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -62,8 +64,8 @@ const tiers = [
       "Multi-agent monitoring",
       "Webhook & email alerts",
     ],
-    cta: "Start Pro Trial",
-    href: "/contact?plan=pro",
+    cta: "Get Pro Access",
+    href: "/register",
     highlight: true,
   },
   {
@@ -311,6 +313,206 @@ function GridBackground() {
   );
 }
 
+/* ─────────────────── Landing Wizard (visual demo) ─── */
+
+const WIZARD_STEPS = [
+  {
+    num: 1,
+    title: "Install",
+    icon: Terminal,
+    code: `pip install chimera-runtime`,
+    accent: "indigo",
+  },
+  {
+    num: 2,
+    title: "Choose Framework",
+    icon: Cpu,
+    frameworks: ["LangChain", "LangGraph", "CrewAI", "LlamaIndex", "AutoGen"],
+    accent: "cyan",
+  },
+  {
+    num: 3,
+    title: "Pick a Policy",
+    icon: FileText,
+    code: `# policies/governance.csl
+DOMAIN GovernanceGuard {
+  VARIABLES {
+    amount: 0..1000000
+    role: {"MANAGER", "DIRECTOR", "VP"}
+  }
+  STATE_CONSTRAINT limit {
+    WHEN role == "MANAGER"
+    THEN amount <= 250000
+  }
+}`,
+    accent: "green",
+  },
+  {
+    num: 4,
+    title: "Add 3 Lines",
+    icon: Code2,
+    code: `from chimera_runtime.integrations import wrap_tools
+
+guarded = wrap_tools(
+    tools=[your_tool],
+    policy="./policies/governance.csl",
+)`,
+    accent: "indigo",
+  },
+  {
+    num: 5,
+    title: "Launch",
+    icon: Rocket,
+    code: `✓ Policy loaded: GovernanceGuard (7 rules)
+✓ Z3 verification: PASSED
+✓ Runtime guard: ACTIVE
+✓ Audit trail: RECORDING
+
+Agent ready. Every action enforced.`,
+    accent: "green",
+  },
+];
+
+function LandingWizard() {
+  const [activeStep, setActiveStep] = useState(0);
+  const [selectedFw, setSelectedFw] = useState("LangChain");
+
+  // Auto-advance every 4 seconds
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveStep((prev) => (prev + 1) % WIZARD_STEPS.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const step = WIZARD_STEPS[activeStep];
+  const accentColor = step.accent === "cyan" ? "cyan-400" : step.accent === "green" ? "green-400" : "indigo-400";
+
+  return (
+    <div className="rounded-2xl border border-zinc-800/50 bg-[#0c0c14] overflow-hidden">
+      {/* Progress bar */}
+      <div className="flex border-b border-zinc-800/50">
+        {WIZARD_STEPS.map((s, i) => (
+          <button
+            key={s.num}
+            onClick={() => setActiveStep(i)}
+            className={`flex-1 flex items-center justify-center gap-2 px-3 py-3 text-[11px] font-mono transition-all ${
+              i === activeStep
+                ? "bg-indigo-500/10 text-indigo-300 border-b-2 border-indigo-500"
+                : i < activeStep
+                  ? "text-green-400/60"
+                  : "text-zinc-600 hover:text-zinc-400"
+            }`}
+          >
+            <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${
+              i === activeStep ? "bg-indigo-500 text-white" : i < activeStep ? "bg-green-500/20 text-green-400" : "bg-zinc-800 text-zinc-500"
+            }`}>
+              {i < activeStep ? "✓" : s.num}
+            </span>
+            <span className="hidden sm:inline">{s.title}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* Step content */}
+      <div className="p-6 min-h-[280px]">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeStep}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3 }}
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <div className={`w-10 h-10 rounded-xl bg-${accentColor}/10 border border-${accentColor}/20 flex items-center justify-center`}>
+                <step.icon className={`h-5 w-5 text-${accentColor}`} />
+              </div>
+              <div>
+                <p className="text-sm font-bold text-white">Step {step.num}: {step.title}</p>
+                <p className="text-[11px] text-zinc-600">
+                  {step.num === 1 && "One command. All dependencies included."}
+                  {step.num === 2 && "Native plugins for every major framework."}
+                  {step.num === 3 && "CSL policies with Z3 formal verification."}
+                  {step.num === 4 && "Three lines. Zero boilerplate."}
+                  {step.num === 5 && "Deterministic enforcement is live."}
+                </p>
+              </div>
+            </div>
+
+            {/* Framework selector for step 2 */}
+            {step.frameworks && (
+              <div className="flex flex-wrap gap-2 mb-4">
+                {step.frameworks.map((fw) => (
+                  <motion.button
+                    key={fw}
+                    whileHover={{ y: -2 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setSelectedFw(fw)}
+                    className={`text-[11px] font-mono rounded-lg px-4 py-2 border transition-all ${
+                      selectedFw === fw
+                        ? "border-cyan-400/40 bg-cyan-400/10 text-cyan-300"
+                        : "border-zinc-800 text-zinc-500 hover:border-zinc-700"
+                    }`}
+                  >
+                    {fw}
+                  </motion.button>
+                ))}
+              </div>
+            )}
+
+            {/* Code block */}
+            {step.code && (
+              <div className="rounded-xl border border-zinc-800/50 bg-[#08080d] overflow-hidden">
+                <div className="flex items-center gap-2 px-4 py-2 border-b border-zinc-800/30">
+                  <div className="flex gap-1.5">
+                    <div className="h-2 w-2 rounded-full bg-[#ff5f57]" />
+                    <div className="h-2 w-2 rounded-full bg-[#febc2e]" />
+                    <div className="h-2 w-2 rounded-full bg-[#28c840]" />
+                  </div>
+                  <span className="ml-2 text-[9px] font-mono text-zinc-600">
+                    {step.num === 1 && "terminal"}
+                    {step.num === 3 && "governance.csl"}
+                    {step.num === 4 && "agent.py"}
+                    {step.num === 5 && "output"}
+                  </span>
+                </div>
+                <pre className="p-4 text-xs font-mono text-zinc-300 leading-relaxed overflow-x-auto">
+                  {step.code}
+                </pre>
+              </div>
+            )}
+
+            {/* Step 2 without code but with framework-specific info */}
+            {step.frameworks && !step.code && (
+              <div className="rounded-xl border border-zinc-800/50 bg-[#08080d] p-4">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-8 h-8 rounded-lg bg-cyan-400/10 flex items-center justify-center text-lg">
+                    {selectedFw === "LangChain" ? "🦜" : selectedFw === "LangGraph" ? "🔀" : selectedFw === "CrewAI" ? "👥" : selectedFw === "LlamaIndex" ? "🦙" : "🤖"}
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-white">{selectedFw}</p>
+                    <p className="text-[11px] text-zinc-500">
+                      {selectedFw === "LangChain" && "Tool wrapping for ReAct agents"}
+                      {selectedFw === "LangGraph" && "Graph node & edge integration"}
+                      {selectedFw === "CrewAI" && "Multi-agent crew tool guard"}
+                      {selectedFw === "LlamaIndex" && "Query engine tool wrapping"}
+                      {selectedFw === "AutoGen" && "Function call decorator"}
+                    </p>
+                  </div>
+                </div>
+                <pre className="text-xs font-mono text-cyan-400/80">
+                  pip install chimera-runtime[{selectedFw.toLowerCase()}]
+                </pre>
+              </div>
+            )}
+          </motion.div>
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+}
+
 /* ─────────────────────────────────── MAIN PAGE ─── */
 
 export default function LandingPage() {
@@ -370,7 +572,7 @@ export default function LandingPage() {
                 Join the first wave of teams enforcing <span className="text-white font-medium">deterministic AI behavior</span>.
               </p>
               <div className="flex gap-3">
-                <Link href="/contact?plan=pro" className="flex-1" onClick={() => { analytics.ctaClick("beta-claim-pro"); dismissPopup(); }}>
+                <Link href="/register" className="flex-1" onClick={() => { analytics.ctaClick("beta-claim-pro"); dismissPopup(); }}>
                   <Button className="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-medium">
                     Claim Free Pro
                   </Button>
@@ -917,30 +1119,6 @@ export default function LandingPage() {
             </div>
           </FadeInSection>
 
-          {/* ──────────── FEATURE CARDS: 3 capabilities ──────────── */}
-          <div className="grid md:grid-cols-3 gap-4 mb-24 items-stretch">
-            {[
-              { icon: Lock, title: "Enforce", desc: "Constraints live outside the model. The model's opinion is irrelevant. Actions are blocked before execution.", accent: "indigo" },
-              { icon: Cpu, title: "Verify", desc: "Z3 theorem prover validates every policy. Mathematically proven correct before a single agent runs.", accent: "cyan" },
-              { icon: Shield, title: "Block", desc: "Invalid actions die before execution. No recovery needed. No damage done. Full audit trail.", accent: "indigo" },
-            ].map((item, i) => (
-              <FadeInSection key={item.title} delay={i * 0.1} className="h-full">
-                <motion.div
-                  whileHover={{ y: -8, borderColor: item.accent === "cyan" ? "rgba(6,182,212,0.3)" : "rgba(99,102,241,0.3)" }}
-                  className="group relative rounded-xl border border-zinc-800/50 bg-[#0c0c14] p-8 transition-all overflow-hidden h-full"
-                >
-                  {/* Shimmer effect on hover */}
-                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-shimmer" />
-                  <div className="relative z-10">
-                    <item.icon className={`h-8 w-8 mb-4 ${item.accent === "cyan" ? "text-cyan-400/60 group-hover:text-cyan-400" : "text-indigo-400/60 group-hover:text-indigo-400"} transition-colors duration-300`} />
-                    <h3 className="text-xl font-black text-white mb-2">{item.title}</h3>
-                    <p className="text-sm text-zinc-500 leading-relaxed">{item.desc}</p>
-                  </div>
-                </motion.div>
-              </FadeInSection>
-            ))}
-          </div>
-
           {/* ──────────── ANALYTICS SHOWCASE ──────────── */}
           <div className="grid lg:grid-cols-2 gap-6 mb-24 items-center">
             <FadeInSection>
@@ -1085,58 +1263,20 @@ export default function LandingPage() {
           </FadeInSection>
 
           {/* ──────────── CONNECT AGENT WIZARD ──────────── */}
-          <div className="grid lg:grid-cols-2 gap-6 mb-24 items-center">
+          <div className="mb-24">
             <FadeInSection>
-              <div className="space-y-6">
-                <span className="text-[10px] font-mono text-cyan-400/60 uppercase tracking-[0.3em]">Agent Integration</span>
-                <h3 className="text-2xl sm:text-3xl font-black text-white leading-tight">
+              <div className="text-center mb-10">
+                <span className="text-[10px] font-mono text-cyan-400/60 uppercase tracking-[0.3em]">5-Minute Integration</span>
+                <h3 className="text-2xl sm:text-3xl font-black text-white leading-tight mt-3">
                   Connect any framework.
                   <br />
-                  <span className="text-zinc-600">Four steps. Full control.</span>
+                  <span className="text-zinc-600">Five steps. Full control.</span>
                 </h3>
-                <p className="text-sm text-zinc-500 leading-relaxed">
-                  The Connect Wizard generates integration code for your stack.
-                  Select your framework, pick a policy, copy the code. Done.
-                </p>
-
-                {/* Framework pills */}
-                <div className="flex flex-wrap gap-2">
-                  {["LangChain", "LangGraph", "CrewAI", "LlamaIndex", "AutoGen", "OpenAI"].map((fw) => (
-                    <motion.span
-                      key={fw}
-                      whileHover={{ y: -2, borderColor: "rgba(6,182,212,0.4)" }}
-                      className="text-[10px] font-mono text-zinc-500 border border-zinc-800/50 rounded-full px-3 py-1.5 bg-zinc-900/30 transition-colors cursor-default"
-                    >
-                      {fw}
-                    </motion.span>
-                  ))}
-                </div>
               </div>
             </FadeInSection>
 
             <FadeInSection delay={0.2}>
-              <div className="perspective-container">
-                <motion.div
-                  className="perspective-card rounded-2xl border border-zinc-800/50 bg-[#0c0c14] overflow-hidden"
-                  whileHover={{ scale: 1.02 }}
-                >
-                  <div className="flex items-center gap-2 px-4 py-2.5 bg-[#08080d] border-b border-zinc-800/50">
-                    <div className="flex gap-1.5">
-                      <div className="h-2 w-2 rounded-full bg-[#ff5f57]" />
-                      <div className="h-2 w-2 rounded-full bg-[#febc2e]" />
-                      <div className="h-2 w-2 rounded-full bg-[#28c840]" />
-                    </div>
-                    <span className="ml-3 text-[9px] font-mono text-zinc-600">connect agent — integration wizard</span>
-                  </div>
-                  <Image
-                    src="/showcase/framework.png"
-                    alt="Agent integration wizard — connect any framework in 4 steps"
-                    width={800}
-                    height={500}
-                    className="w-full h-auto"
-                  />
-                </motion.div>
-              </div>
+              <LandingWizard />
             </FadeInSection>
           </div>
 
@@ -1211,6 +1351,96 @@ export default function LandingPage() {
 
       {/* ── MARQUEE 2 ── */}
       <ScrollingMarquee />
+
+      {/* ══════════ POLICY MARKETPLACE SHOWCASE ══════════ */}
+      <section className="relative py-24 border-t border-zinc-800/30">
+        <div className="mx-auto max-w-6xl px-6">
+          <FadeInSection>
+            <div className="text-center mb-14">
+              <span className="text-[10px] font-mono text-indigo-400/60 uppercase tracking-[0.3em] block mb-4">Policy Marketplace</span>
+              <h2 className="text-2xl sm:text-4xl font-black text-white leading-tight">
+                Templates for <span className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">every domain</span>
+              </h2>
+              <p className="mt-3 text-sm text-zinc-500 max-w-lg mx-auto">
+                Browse verified CSL policies from the community. Fork, customize, deploy.
+              </p>
+            </div>
+          </FadeInSection>
+
+          {/* Category Grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 mb-12">
+            {[
+              { icon: "💰", label: "Finance", count: 3, color: "green" },
+              { icon: "🏥", label: "Healthcare", count: 1, color: "red" },
+              { icon: "🔗", label: "DeFi / Web3", count: 3, color: "purple" },
+              { icon: "🛡️", label: "AI Safety", count: 3, color: "amber" },
+              { icon: "🖥️", label: "DevOps", count: 1, color: "blue" },
+              { icon: "🛒", label: "E-Commerce", count: 1, color: "cyan" },
+              { icon: "🎮", label: "Gaming", count: 1, color: "pink" },
+              { icon: "🔒", label: "Privacy", count: 1, color: "indigo" },
+            ].map((cat, i) => (
+              <FadeInSection key={cat.label} delay={i * 0.05}>
+                <motion.div
+                  whileHover={{ y: -4, borderColor: "rgba(99,102,241,0.3)" }}
+                  className="group rounded-xl border border-zinc-800/50 bg-[#0c0c14] p-5 text-center transition-all cursor-default"
+                >
+                  <span className="text-2xl block mb-2">{cat.icon}</span>
+                  <p className="text-sm font-bold text-white">{cat.label}</p>
+                  <p className="text-[10px] font-mono text-zinc-600 mt-1">{cat.count} {cat.count === 1 ? 'policy' : 'policies'}</p>
+                </motion.div>
+              </FadeInSection>
+            ))}
+          </div>
+
+          {/* CTAs: Browse + Submit PR + Fellowship */}
+          <FadeInSection delay={0.3}>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link href="/register" onClick={() => analytics.ctaClick("marketplace-browse")}>
+                <motion.div
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="flex items-center gap-2 px-6 py-3 rounded-xl bg-indigo-500 text-white text-sm font-medium hover:bg-indigo-600 transition-colors"
+                >
+                  <Sparkles className="h-4 w-4" />
+                  Browse Marketplace
+                </motion.div>
+              </Link>
+
+              <a href="https://github.com/Chimera-Protocol/csl-core/tree/main/examples/community" target="_blank" rel="noopener noreferrer">
+                <motion.div
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="flex items-center gap-2 px-6 py-3 rounded-xl border border-green-500/30 bg-green-500/5 text-green-400 text-sm font-medium hover:bg-green-500/10 transition-colors"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                  Submit a Policy PR
+                </motion.div>
+              </a>
+
+              <a href="https://chimera-protocol.com" target="_blank" rel="noopener noreferrer">
+                <motion.div
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="flex items-center gap-2 px-6 py-3 rounded-xl border border-cyan-500/30 bg-cyan-500/5 text-cyan-400 text-sm font-medium hover:bg-cyan-500/10 transition-colors"
+                >
+                  <Users className="h-4 w-4" />
+                  Become a Research Fellow
+                </motion.div>
+              </a>
+            </div>
+          </FadeInSection>
+
+          {/* Fellowship info */}
+          <FadeInSection delay={0.4}>
+            <div className="mt-8 text-center">
+              <p className="text-[11px] text-zinc-600 max-w-md mx-auto">
+                Contributors who submit policies via PR become <span className="text-cyan-400/80">Chimera Research Fellows</span> —
+                recognized in the marketplace with their GitHub profile.
+              </p>
+            </div>
+          </FadeInSection>
+        </div>
+      </section>
 
       {/* ═══════════════════════════════════════════════════════════════
           PARADIGM SHIFT (moved after Solution)
