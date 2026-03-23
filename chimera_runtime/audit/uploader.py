@@ -129,7 +129,7 @@ class AuditUploader:
 
     def _upload_single(self, record: dict) -> bool:
         """Upload a single record with retries."""
-        url = f"{self._base_url}/ingest"
+        url = f"{self._base_url}/ingest/"
         data = json.dumps(record, default=str).encode("utf-8")
 
         for attempt in range(self._max_retries):
@@ -170,7 +170,7 @@ class AuditUploader:
 
     def _upload_batch(self, records: list) -> bool:
         """Upload a batch of records with retries."""
-        url = f"{self._base_url}/ingest/batch"
+        url = f"{self._base_url}/ingest/batch/"
         data = json.dumps({"records": records}, default=str).encode("utf-8")
 
         for attempt in range(self._max_retries):

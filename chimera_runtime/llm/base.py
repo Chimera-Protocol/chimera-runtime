@@ -294,13 +294,14 @@ class BaseLLMProvider(ABC):
         if isinstance(parsed, dict):
             found_list = False
             for key, value in parsed.items():
-                if isinstance(value, list):
+                if isinstance(value, list) and len(value) > 0 and isinstance(value[0], dict):
                     parsed = value
                     found_list = True
                     break
-            
-            if not found_list and "strategy" in parsed and "parameters" in parsed:
-                parsed = [parsed] 
+
+            if not found_list:
+                # Treat single dict as a one-element array
+                parsed = [parsed]
 
         if not isinstance(parsed, list):
             raise LLMResponseParseError(
