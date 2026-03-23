@@ -1,0 +1,22 @@
+// =============================================================
+// CSL Quickstart: Your First Policy
+// A simple rule to restrict large external transfers.
+// =============================================================
+
+CONFIG {
+  ENFORCEMENT_MODE: BLOCK
+}
+
+DOMAIN QuickStart {
+
+  VARIABLES {
+    amount: 0..10000
+    destination: {"INTERNAL", "EXTERNAL"}
+  }
+
+  // Transfers of 100 or more must stay INTERNAL
+  STATE_CONSTRAINT limit_large_transfers {
+    WHEN amount >= 100
+    THEN destination MUST BE "INTERNAL"
+  }
+}

@@ -239,7 +239,6 @@ DOMAIN ContentGuard {
     user_age: 0..120
     category: {"GENERAL", "TEEN", "MATURE", "RESTRICTED"}
     verified_identity: {"YES", "NO"}
-    content_risk_score: 0..100
     region: {"US", "EU", "APAC"}
   }
 
@@ -255,16 +254,10 @@ DOMAIN ContentGuard {
     THEN category MUST NOT BE "RESTRICTED"
   }
 
-  // Restricted content requires identity verification
+  // Restricted content requires identity verification for adults
   STATE_CONSTRAINT restricted_requires_verification {
     WHEN category == "RESTRICTED" AND user_age >= 18
     THEN verified_identity MUST BE "YES"
-  }
-
-  // High risk content blocked for all
-  STATE_CONSTRAINT block_high_risk {
-    WHEN content_risk_score > 85
-    THEN category MUST NOT BE "RESTRICTED"
   }
 
   // EU region has stricter age limit for TEEN content
@@ -287,13 +280,6 @@ DOMAIN FinanceGuard {
     role: {"ANALYST", "MANAGER", "DIRECTOR", "VP", "CFO"}
     transfer_type: {"INTERNAL", "EXTERNAL", "INTERNATIONAL"}
     requires_dual_approval: {"YES", "NO"}
-    risk_level: {"LOW", "MEDIUM", "HIGH", "CRITICAL"}
-  }
-
-  // Analysts cannot initiate any transfers
-  STATE_CONSTRAINT analyst_no_transfers {
-    WHEN role == "ANALYST"
-    THEN amount <= 0
   }
 
   // Managers limited to $100,000 for external transfers
@@ -302,16 +288,22 @@ DOMAIN FinanceGuard {
     THEN amount <= 100000
   }
 
-  // International transfers require Director or above
-  STATE_CONSTRAINT international_director_required {
+  // International transfers by managers capped at $50,000
+  STATE_CONSTRAINT manager_international_limit {
     WHEN transfer_type == "INTERNATIONAL" AND role == "MANAGER"
-    THEN amount <= 0
+    THEN amount <= 50000
   }
 
-  // High-risk transfers above $500,000 need dual approval
-  STATE_CONSTRAINT high_value_dual_approval {
-    WHEN amount > 500000 AND risk_level == "HIGH"
-    THEN requires_dual_approval == "YES"
+  // Directors limited to $500,000 per transaction
+  STATE_CONSTRAINT director_limit {
+    WHEN role == "DIRECTOR"
+    THEN amount <= 500000
+  }
+
+  // VP limited to $1,000,000 per transaction
+  STATE_CONSTRAINT vp_limit {
+    WHEN role == "VP"
+    THEN amount <= 1000000
   }
 
   // Absolute ceiling per transaction
