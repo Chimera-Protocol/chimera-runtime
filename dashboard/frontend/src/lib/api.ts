@@ -19,8 +19,11 @@ function getAuthHeader(): Record<string, string> {
 async function fetchApi<T>(path: string, options?: RequestInit): Promise<T> {
   const url = `${API_BASE}${path}`;
   const res = await fetch(url, {
+    cache: "no-store",
     headers: {
       "Content-Type": "application/json",
+      "Cache-Control": "no-cache, no-store, must-revalidate",
+      Pragma: "no-cache",
       ...getAuthHeader(),
       ...options?.headers,
     },
@@ -199,7 +202,12 @@ export const api = {
   exportDecisions: async (format: string = "json", tier: string = "free") => {
     const url = `${API_BASE}/audit/export?format=${format}&tier=${tier}`;
     const res = await fetch(url, {
-      headers: { ...getAuthHeader() },
+      cache: "no-store",
+      headers: {
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        Pragma: "no-cache",
+        ...getAuthHeader(),
+      },
     });
     if (!res.ok) throw new Error("Export failed");
     const blob = await res.blob();
@@ -251,6 +259,25 @@ export const api = {
     fetchApi<{ status: string; id: number }>(
       `/settings/api-keys/${keyId}`,
       { method: "DELETE" }
+    ),
+
+  // ── Wallet / Balance ────────────────────────────────────────────
+  getWallet: () =>
+    fetchApi<{
+      credits: number;
+      total_credits: number;
+      spent_credits: number;
+      usage_percent: number;
+      remaining_ingests: number;
+      tier: string;
+      tier_allocation: number;
+      costs: Record<string, number>;
+      need_more: string;
+    }>("/wallet"),
+
+  getTransactions: (limit: number = 50) =>
+    fetchApi<{ transactions: Array<{ id: number; amount_cents: number; amount_dollars: number; operation: string; description: string; decision_id: string | null; balance_after_dollars: number; created_at: string }>; total: number }>(
+      `/wallet/transactions?limit=${limit}`
     ),
 
   // ── Admin ─────────────────────────────────────────────────────────

@@ -9,12 +9,15 @@ from fastapi import Request, HTTPException
 
 # Module-level service reference (initialized by main.py lifespan)
 _auth_service = None
+_db_path: Optional[str] = None
 
 
-def init_auth_middleware(auth_service):
+def init_auth_middleware(auth_service, db_path: Optional[str] = None):
     """Initialize with auth service instance."""
-    global _auth_service
+    global _auth_service, _db_path
     _auth_service = auth_service
+    if db_path:
+        _db_path = db_path
 
 
 async def get_optional_user(request: Request) -> Optional[dict]:

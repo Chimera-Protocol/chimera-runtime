@@ -481,6 +481,35 @@ export default function ConnectAgentPage() {
               </pre>
             </div>
 
+            {/* Cloud Sync Setup (Pro+) */}
+            {user && user.tier !== "free" && (
+              <div className="mt-6 rounded-lg border border-[#6366f1]/20 bg-[#6366f1]/5 p-4">
+                <p className="text-sm font-medium text-[#818cf8] mb-2">☁️ Cloud Sync (Pro)</p>
+                <p className="text-xs text-[#818cf8]/70 mb-3">
+                  Set these environment variables so audit logs automatically sync to your dashboard:
+                </p>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 rounded-lg bg-[#0a0a0f] border border-[#1e1e2e] px-4 py-2.5">
+                    <Terminal className="h-3.5 w-3.5 text-[#6366f1] shrink-0" />
+                    <code className="flex-1 text-xs text-[#e4e4e7] font-mono">
+                      export CHIMERA_DASHBOARD_API_KEY=your_api_key
+                    </code>
+                  </div>
+                  <div className="flex items-center gap-2 rounded-lg bg-[#0a0a0f] border border-[#1e1e2e] px-4 py-2.5">
+                    <Terminal className="h-3.5 w-3.5 text-[#6366f1] shrink-0" />
+                    <code className="flex-1 text-xs text-[#e4e4e7] font-mono">
+                      export CHIMERA_DASHBOARD_URL=https://api-runtime.chimera-protocol.com/api/v1
+                    </code>
+                  </div>
+                </div>
+                <p className="mt-2 text-[11px] text-[#818cf8]/50">
+                  Generate an API key in{" "}
+                  <a href="/settings" className="underline hover:text-[#818cf8]">Settings → API Keys</a>.
+                  Audit logs will automatically stream to this dashboard.
+                </p>
+              </div>
+            )}
+
             {/* What happens next */}
             <div className="mt-6 rounded-lg border border-[#22c55e]/20 bg-[#22c55e]/5 p-4">
               <p className="text-sm font-medium text-[#22c55e] mb-2">What happens now?</p>
@@ -495,12 +524,19 @@ export default function ConnectAgentPage() {
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle2 className="h-3.5 w-3.5 mt-0.5 shrink-0" />
-                  Every decision is recorded in <code className="bg-[#22c55e]/10 px-1 rounded">./audit_logs/</code>
+                  Every decision is saved locally in <code className="bg-[#22c55e]/10 px-1 rounded">./audit_logs/</code>
                 </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="h-3.5 w-3.5 mt-0.5 shrink-0" />
-                  View results in this dashboard under Decisions
-                </li>
+                {user && user.tier !== "free" ? (
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="h-3.5 w-3.5 mt-0.5 shrink-0" />
+                    With cloud sync enabled, results appear in this dashboard in real-time
+                  </li>
+                ) : (
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="h-3.5 w-3.5 mt-0.5 shrink-0" />
+                    Upgrade to Pro for real-time cloud sync to this dashboard
+                  </li>
+                )}
               </ul>
             </div>
 

@@ -17,6 +17,7 @@ from .storage import (
 )
 from .query import AuditQuery, AuditStats
 from .html_report import generate_html
+from .uploader import AuditUploader, init_uploader, shutdown_uploader, get_uploader
 
 __all__ = [
     "build_audit_record",
@@ -28,4 +29,8 @@ __all__ = [
     "AuditQuery",
     "AuditStats",
     "generate_html",
+    "AuditUploader",
+    "init_uploader",
+    "shutdown_uploader",
+    "get_uploader",
 ]

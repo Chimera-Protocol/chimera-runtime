@@ -51,12 +51,30 @@ class ComplianceGuard:
         audit_dir: str = "./audit_logs",
         dry_run: bool = False,
         auto_verify: bool = True,
+        api_key: Optional[str] = None,
+        dashboard_url: Optional[str] = None,
     ):
         self._policy_manager = PolicyManager(
             policy, auto_verify=auto_verify, dry_run=dry_run
         )
         self._audit_dir = audit_dir
         self._dry_run = dry_run
+
+        # Cloud upload (Pro+ only)
+        self._uploader = None
+        import os
+        _api_key = api_key or os.getenv("CHIMERA_DASHBOARD_API_KEY")
+        _dashboard_url = dashboard_url or os.getenv(
+            "CHIMERA_DASHBOARD_URL",
+            "https://api-runtime.chimera-protocol.com/api/v1",
+        )
+        if _api_key:
+            try:
+                from ..audit.uploader import AuditUploader
+                self._uploader = AuditUploader(api_key=_api_key, dashboard_url=_dashboard_url)
+                self._uploader.start()
+            except Exception:
+                pass
 
     def check(
         self,
@@ -118,6 +136,9 @@ class ComplianceGuard:
                 total_duration_ms=evaluation.duration_ms,
             )
             save_record(record, audit_dir=self._audit_dir)
+            # Upload to cloud (non-blocking)
+            if self._uploader:
+                self._uploader.enqueue(record.to_dict())
         except Exception:
             pass  # Don't let audit failures break the guard
 

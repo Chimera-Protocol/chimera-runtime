@@ -119,6 +119,67 @@ def policy_list(ctx, policy_dir):
     display_policy_list(policies, policy_dir)
 
 
+@policy_cmd.command("pull")
+@click.argument("name")
+@click.option("--dir", "-d", "policy_dir", default="./policies", help="Policy directory")
+@click.option("--url", default=None, help="Dashboard API URL")
+@click.option("--key", default=None, help="API key (or set CHIMERA_DASHBOARD_API_KEY)")
+@pass_ctx
+def policy_pull(ctx, name, policy_dir, url, key):
+    """Pull a policy file from the Chimera Runtime Dashboard.
+
+    NAME: Policy filename (e.g., governance.csl)
+
+    \b
+    Examples:
+        chimera-runtime policy pull governance.csl
+        chimera-runtime policy pull governance.csl --key chm_xxx
+    """
+    import os
+    from urllib.request import Request, urlopen
+    from urllib.error import URLError, HTTPError
+
+    api_key = key or os.getenv("CHIMERA_DASHBOARD_API_KEY")
+    if not api_key:
+        err_console.print(
+            "[bold red]❌ No API key.[/bold red] Set CHIMERA_DASHBOARD_API_KEY or use --key"
+        )
+        raise SystemExit(1)
+
+    dashboard_url = url or os.getenv(
+        "CHIMERA_DASHBOARD_URL",
+        "https://api-runtime.chimera-protocol.com/api/v1",
+    )
+    download_url = f"{dashboard_url.rstrip('/')}/policies/{name}/download"
+
+    try:
+        with console.status(f"[cyan]Pulling {name}...[/cyan]", spinner="dots"):
+            req = Request(
+                download_url,
+                headers={"X-API-Key": api_key},
+            )
+            with urlopen(req, timeout=30) as resp:
+                content = resp.read().decode("utf-8")
+    except HTTPError as e:
+        if e.code == 404:
+            err_console.print(f"[bold red]❌ Policy not found:[/bold red] {name}")
+        elif e.code in (401, 403):
+            err_console.print(f"[bold red]❌ Auth error:[/bold red] Check your API key")
+        else:
+            err_console.print(f"[bold red]❌ Server error {e.code}[/bold red]")
+        raise SystemExit(1)
+    except (URLError, OSError) as e:
+        err_console.print(f"[bold red]❌ Connection failed:[/bold red] {e}")
+        raise SystemExit(1)
+
+    filepath = Path(policy_dir) / name
+    filepath.parent.mkdir(parents=True, exist_ok=True)
+    filepath.write_text(content, encoding="utf-8")
+
+    console.print(f"\n[bold green]✅ Pulled:[/bold green] [cyan]{filepath}[/cyan]")
+    console.print(f"   [dim]{len(content)} bytes, saved to {filepath}[/dim]\n")
+
+
 @policy_cmd.command("simulate")
 @click.argument("policy_file")
 @click.argument("context_json", required=False)

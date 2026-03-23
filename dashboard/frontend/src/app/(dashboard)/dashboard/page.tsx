@@ -39,7 +39,7 @@ function DemoBanner() {
         <p className="text-sm font-medium text-white">Sample Data</p>
         <p className="text-xs text-[#71717a] mt-1 leading-relaxed">
           This dashboard is populated with sample audit records for demonstration purposes.
-          Connect your own agent via <span className="text-indigo-400 font-mono">pip install chimera-runtime</span> to see real enforcement data.
+          Cloud sync is coming soon — you&apos;ll be able to push live enforcement data from your agents directly to this dashboard.
         </p>
         <div className="flex items-center gap-3 mt-3">
           <button

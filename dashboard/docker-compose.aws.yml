@@ -1,0 +1,29 @@
+# AWS deployment override
+# Usage: docker compose -f docker-compose.yml -f docker-compose.aws.yml up --build -d
+#
+# Differences from prod:
+#   - S3 storage backend for audit logs
+#   - Caddy runs on host (not Docker), so no port hiding needed
+#   - Uses network_mode: host for direct localhost access
+
+services:
+  backend:
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      - CHIMERA_SECRET_KEY=${CHIMERA_SECRET_KEY}
+      - CHIMERA_CORS_ORIGINS=https://runtime.chimera-protocol.com
+      - CHIMERA_LICENSE_PRIVATE_KEY=${CHIMERA_LICENSE_PRIVATE_KEY}
+      # S3 Storage
+      - CHIMERA_STORAGE_BACKEND=${CHIMERA_STORAGE_BACKEND:-local}
+      - CHIMERA_S3_BUCKET=${CHIMERA_S3_BUCKET:-}
+      - AWS_REGION=${AWS_REGION:-us-east-1}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID:-}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY:-}
+
+  frontend:
+    ports:
+      - "127.0.0.1:3000:3000"
+    build:
+      args:
+        - NEXT_PUBLIC_API_URL=https://api-runtime.chimera-protocol.com/api/v1

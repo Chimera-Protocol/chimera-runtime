@@ -1,0 +1,19 @@
+# Chimera Runtime — Caddy Reverse Proxy Configuration
+# Auto-manages Let's Encrypt SSL certificates
+
+runtime.chimera-protocol.com {
+    reverse_proxy localhost:3000
+}
+
+api-runtime.chimera-protocol.com {
+    reverse_proxy localhost:8000
+}
+
+# Legacy redirects (compliance → runtime)
+compliance.chimera-protocol.com {
+    redir https://runtime.chimera-protocol.com{uri} permanent
+}
+
+api-compliance.chimera-protocol.com {
+    redir https://api-runtime.chimera-protocol.com{uri} permanent
+}

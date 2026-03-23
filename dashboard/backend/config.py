@@ -27,6 +27,11 @@ class DashboardConfig:
     # Database
     database_url: str = "sqlite:///./dashboard/chimera_dashboard.db"
 
+    # Storage backend ("local" or "s3")
+    storage_backend: str = "local"
+    s3_bucket: str = ""
+    s3_region: str = "us-east-1"
+
     # CORS
     cors_origins: list = field(default_factory=lambda: [
         "http://localhost:3000",
@@ -57,5 +62,8 @@ class DashboardConfig:
                 "CHIMERA_DATABASE_URL",
                 "sqlite:///./dashboard/chimera_dashboard.db",
             ),
+            storage_backend=os.getenv("CHIMERA_STORAGE_BACKEND", "local"),
+            s3_bucket=os.getenv("CHIMERA_S3_BUCKET", ""),
+            s3_region=os.getenv("AWS_REGION", "us-east-1"),
             cors_origins=cors_origins,
         )

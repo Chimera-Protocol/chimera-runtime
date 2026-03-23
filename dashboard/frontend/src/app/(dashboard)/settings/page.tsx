@@ -26,6 +26,10 @@ import {
   Users,
   Mail,
   BarChart3,
+  Wallet,
+  TrendingDown,
+  ArrowUpRight,
+  ArrowDownRight,
 } from "lucide-react";
 
 interface AdminStats {
@@ -93,6 +97,20 @@ export default function SettingsPage() {
   const [changingPassword, setChangingPassword] = useState(false);
   const [passwordMessage, setPasswordMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
+  // Wallet state
+  const [walletData, setWalletData] = useState<{
+    credits: number; total_credits: number; spent_credits: number;
+    usage_percent: number; remaining_ingests: number;
+    tier: string; tier_allocation: number; costs: Record<string, number>;
+    need_more: string;
+  } | null>(null);
+  const [transactions, setTransactions] = useState<Array<{
+    id: number; amount_dollars: number; operation: string; description: string;
+    balance_after_dollars: number; created_at: string;
+  }>>([]);
+  const [walletLoading, setWalletLoading] = useState(false);
+  const [showTransactions, setShowTransactions] = useState(false);
+
   // Admin state
   const [adminStats, setAdminStats] = useState<AdminStats | null>(null);
   const [adminLoading, setAdminLoading] = useState(false);
@@ -102,10 +120,35 @@ export default function SettingsPage() {
   useEffect(() => {
     fetchKeys();
     fetchAgents();
+    if (user?.tier) {
+      fetchWallet();
+    }
     if (user?.tier === "enterprise") {
       fetchAdminStats();
     }
   }, [user]);
+
+  const fetchWallet = async () => {
+    setWalletLoading(true);
+    try {
+      const data = await api.getWallet();
+      setWalletData(data);
+    } catch {
+      // Not pro — ignore
+    } finally {
+      setWalletLoading(false);
+    }
+  };
+
+  const fetchTransactions = async () => {
+    try {
+      const data = await api.getTransactions(20);
+      setTransactions(data.transactions);
+      setShowTransactions(true);
+    } catch {
+      // ignore
+    }
+  };
 
   const fetchKeys = async () => {
     try {
@@ -343,6 +386,123 @@ export default function SettingsPage() {
               </span>
             )}
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Usage / Wallet — All tiers */}
+      <Card className="border-[#6366f1]/20 bg-[#111119]">
+        <CardHeader>
+          <CardTitle className="text-white flex items-center gap-2">
+            <Wallet className="h-5 w-5 text-[#6366f1]" />
+            Usage Balance
+            <Badge variant="outline" className="border-[#6366f1]/30 text-[#818cf8] text-[10px] ml-2">
+              {(user?.tier || "free").toUpperCase()}
+            </Badge>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {walletLoading ? (
+            <div className="flex justify-center py-8">
+              <Loader2 className="h-6 w-6 animate-spin text-[#6366f1]" />
+            </div>
+          ) : walletData ? (
+            <div className="space-y-4">
+              <div className="grid gap-3 sm:grid-cols-3">
+                <div className="rounded-lg border border-[#1e1e2e] bg-[#0a0a0f] p-4">
+                  <p className="text-xs text-[#71717a] mb-1">Credits Remaining</p>
+                  <p className="text-2xl font-bold text-white">
+                    {walletData.credits.toLocaleString()}
+                  </p>
+                  <p className="text-[10px] text-[#52525b] mt-1">
+                    ~{walletData.remaining_ingests.toLocaleString()} ingests remaining
+                  </p>
+                </div>
+                <div className="rounded-lg border border-[#1e1e2e] bg-[#0a0a0f] p-4">
+                  <p className="text-xs text-[#71717a] mb-1">Credits Used</p>
+                  <p className="text-2xl font-bold text-[#818cf8]">
+                    {walletData.spent_credits.toLocaleString()}
+                  </p>
+                  <div className="mt-1.5 h-1.5 w-full rounded-full bg-[#1e1e2e] overflow-hidden">
+                    <div
+                      className="h-full rounded-full transition-all"
+                      style={{
+                        width: `${Math.min(walletData.usage_percent, 100)}%`,
+                        backgroundColor: walletData.usage_percent > 90 ? "#ef4444" : walletData.usage_percent > 70 ? "#f59e0b" : "#6366f1",
+                      }}
+                    />
+                  </div>
+                  <p className="text-[10px] text-[#52525b] mt-1">{walletData.usage_percent}% used</p>
+                </div>
+                <div className="rounded-lg border border-[#1e1e2e] bg-[#0a0a0f] p-4">
+                  <p className="text-xs text-[#71717a] mb-1">Total Allocation</p>
+                  <p className="text-2xl font-bold text-[#22c55e]">
+                    {walletData.tier_allocation.toLocaleString()}
+                  </p>
+                  <p className="text-[10px] text-[#52525b] mt-1">{user?.tier} tier allowance</p>
+                </div>
+              </div>
+
+              {/* Cost per operation */}
+              <div className="rounded-lg border border-[#1e1e2e] bg-[#0a0a0f] p-3">
+                <p className="text-xs text-[#71717a] mb-2">Cost per operation (credits):</p>
+                <div className="flex flex-wrap gap-3 text-xs">
+                  {walletData.costs && Object.entries(walletData.costs).map(([op, cost]) => (
+                    <span key={op} className="text-[#a1a1aa]">
+                      {op}: <span className={cost === 0 ? "text-[#22c55e] font-medium" : "text-white font-medium"}>{cost === 0 ? "free" : `${cost} credit${cost !== 1 ? "s" : ""}`}</span>
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Transactions */}
+              {!showTransactions ? (
+                <button
+                  onClick={fetchTransactions}
+                  className="text-xs text-[#6366f1] hover:text-[#818cf8] transition"
+                >
+                  View recent transactions →
+                </button>
+              ) : transactions.length > 0 ? (
+                <div>
+                  <p className="text-xs text-[#71717a] mb-2">Recent Transactions</p>
+                  <div className="space-y-1 max-h-48 overflow-y-auto">
+                    {transactions.map((tx) => (
+                      <div key={tx.id} className="flex items-center justify-between rounded-lg border border-[#1e1e2e] bg-[#0a0a0f] px-3 py-2">
+                        <div className="flex items-center gap-2">
+                          {tx.amount_dollars > 0 ? (
+                            <ArrowUpRight className="h-3.5 w-3.5 text-[#22c55e]" />
+                          ) : (
+                            <ArrowDownRight className="h-3.5 w-3.5 text-[#ef4444]" />
+                          )}
+                          <span className="text-xs text-white">{tx.description}</span>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <span className={`text-xs font-mono ${tx.amount_dollars > 0 ? "text-[#22c55e]" : "text-[#ef4444]"}`}>
+                            {tx.amount_dollars > 0 ? "+" : ""}{Math.round(Math.abs(tx.amount_dollars) * 1000)} credits
+                          </span>
+                          <span className="text-[10px] text-[#52525b]">
+                            {new Date(tx.created_at).toLocaleDateString()}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+
+              {/* Low balance warning */}
+              {walletData.credits < 100 && (
+                <div className="rounded-lg border border-[#f59e0b]/20 bg-[#f59e0b]/5 p-3">
+                  <p className="text-xs text-[#f59e0b]">
+                    Running low on credits? We&apos;re actively developing the platform and value your feedback.
+                    Reach out to <a href="mailto:research@chimera-protocol.com" className="underline font-medium">research@chimera-protocol.com</a> for additional credits.
+                  </p>
+                </div>
+              )}
+            </div>
+          ) : (
+            <p className="text-sm text-[#71717a] py-4">Unable to load balance data.</p>
+          )}
         </CardContent>
       </Card>
 

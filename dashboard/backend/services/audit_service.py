@@ -1,20 +1,23 @@
 """
 Audit Service — wraps chimera_runtime.audit for the dashboard API.
 
-All data comes from the existing JSON file-based audit storage.
-The Python lib remains unlimited; tier limits are applied here (cloud dashboard only).
+Supports both legacy mode (all records from filesystem) and
+user-isolated mode (records from StorageBackend per user_id).
+Pro+ tier only for cloud pipeline; free tier is local-only.
 """
 
 from __future__ import annotations
 
 import math
 from datetime import datetime, timezone, timedelta
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 from chimera_runtime.audit.query import AuditQuery, AuditStats
 from chimera_runtime.audit.storage import load_record, load_all_records
 from chimera_runtime.audit.html_report import generate_html
 from chimera_runtime.models import DecisionAuditRecord
+
+from .storage_service import StorageBackend
 
 
 # Tier-based limits for the cloud dashboard UI only.
@@ -27,15 +30,34 @@ TIER_LIMITS = {
 
 
 class AuditService:
-    """Wraps AuditQuery with pagination and tier-based limits."""
+    """Wraps AuditQuery with pagination, user isolation, and tier-based limits."""
 
-    def __init__(self, audit_dir: str = "./audit_logs"):
+    def __init__(self, audit_dir: str = "./audit_logs", storage: Optional[StorageBackend] = None):
         self._audit_dir = audit_dir
+        self._storage = storage
+        # Legacy query engine (for backward compat when no storage backend)
         self._query = AuditQuery(audit_dir)
 
     def refresh(self) -> None:
-        """Force reload records from disk."""
+        """Force reload records from disk (legacy mode only)."""
         self._query.refresh()
+
+    def _load_user_records(self, user_id: Optional[int] = None) -> List[DecisionAuditRecord]:
+        """Load records for a specific user from storage backend, or all records in legacy mode."""
+        if user_id is not None and self._storage is not None:
+            # User-isolated mode: load from storage backend
+            raw_records = self._storage.list_records(user_id)
+            records = []
+            for raw in raw_records:
+                try:
+                    records.append(DecisionAuditRecord.from_dict(raw))
+                except Exception:
+                    continue
+            return records
+        else:
+            # Legacy mode: load all from filesystem
+            self._query.refresh()
+            return self._query.filter()
 
     # ========================================================================
     # DECISIONS LIST (paginated)
@@ -51,6 +73,7 @@ class AuditService:
         action: Optional[str] = None,
         agent: Optional[str] = None,
         tier: str = "free",
+        user_id: Optional[int] = None,
     ) -> Dict[str, Any]:
         """Get paginated decision list with tier-based filtering."""
         tier_config = TIER_LIMITS.get(tier, TIER_LIMITS["free"])
@@ -63,14 +86,17 @@ class AuditService:
             if effective_after is None or effective_after < cutoff_str:
                 effective_after = cutoff_str
 
-        records = self._query.filter(
-            result=result,
-            after=effective_after,
-            before=before,
-            action=action,
-        )
+        records = self._load_user_records(user_id)
 
-        # Filter by agent name
+        # Apply filters
+        if result:
+            records = [r for r in records if r.decision.result == result]
+        if effective_after:
+            records = [r for r in records if r.timestamp >= effective_after]
+        if before:
+            records = [r for r in records if r.timestamp <= before]
+        if action:
+            records = [r for r in records if action.lower() in (r.decision.action_taken or "").lower()]
         if agent:
             records = [r for r in records if r.agent.name == agent]
 
@@ -97,10 +123,15 @@ class AuditService:
     # SINGLE DECISION
     # ========================================================================
 
-    def get_decision(self, decision_id: str, tier: str = "free") -> Dict[str, Any]:
+    def get_decision(self, decision_id: str, tier: str = "free", user_id: Optional[int] = None) -> Dict[str, Any]:
         """Get a single decision. Free: summary. Pro+: full detail."""
-        record = load_record(decision_id, audit_dir=self._audit_dir)
         tier_config = TIER_LIMITS.get(tier, TIER_LIMITS["free"])
+
+        if user_id is not None and self._storage is not None:
+            raw = self._storage.load(user_id, decision_id)
+            record = DecisionAuditRecord.from_dict(raw)
+        else:
+            record = load_record(decision_id, audit_dir=self._audit_dir)
 
         if tier_config["full_detail"]:
             return record.to_dict()
@@ -111,41 +142,85 @@ class AuditService:
     # STATS
     # ========================================================================
 
-    def get_stats(self, tier: str = "free", last_days: Optional[int] = None) -> Dict[str, Any]:
+    def get_stats(self, tier: str = "free", last_days: Optional[int] = None, user_id: Optional[int] = None) -> Dict[str, Any]:
         """Get aggregate stats with tier-based date window."""
         tier_config = TIER_LIMITS.get(tier, TIER_LIMITS["free"])
 
         if last_days is None:
             last_days = tier_config["max_days"]
 
-        stats = self._query.stats(last_days=last_days)
-        return stats.to_dict()
+        records = self._load_user_records(user_id)
+
+        # Apply date filter
+        if last_days is not None:
+            cutoff = datetime.now(timezone.utc) - timedelta(days=last_days)
+            cutoff_str = cutoff.strftime("%Y-%m-%dT%H:%M:%SZ")
+            records = [r for r in records if r.timestamp >= cutoff_str]
+
+        # Compute stats manually
+        total = len(records)
+        allowed = sum(1 for r in records if r.decision.result == "ALLOWED")
+        blocked = sum(1 for r in records if r.decision.result == "BLOCKED")
+        overrides = sum(1 for r in records if r.decision.result == "HUMAN_OVERRIDE")
+        interrupted = sum(1 for r in records if r.decision.result == "INTERRUPTED")
+
+        latencies = [r.performance.total_duration_ms for r in records]
+        avg_latency = sum(latencies) / len(latencies) if latencies else 0
+
+        violations = {}
+        for r in records:
+            for attempt in r.reasoning.attempts:
+                for c in attempt.candidates:
+                    if c.policy_evaluation and c.policy_evaluation.violations:
+                        for v in c.policy_evaluation.violations:
+                            violations[v.constraint] = violations.get(v.constraint, 0) + 1
+
+        return {
+            "total_decisions": total,
+            "allowed": allowed,
+            "blocked": blocked,
+            "human_overrides": overrides,
+            "interrupted": interrupted,
+            "block_rate": round(blocked / total, 4) if total > 0 else 0,
+            "avg_latency_ms": round(avg_latency, 2),
+            "top_violations": sorted(violations.items(), key=lambda x: -x[1])[:5],
+            "last_days": last_days,
+        }
 
     # ========================================================================
     # VIOLATIONS
     # ========================================================================
 
-    def get_violations(self, n: int = 10, tier: str = "free") -> List[Dict[str, Any]]:
+    def get_violations(self, n: int = 10, tier: str = "free", user_id: Optional[int] = None) -> List[Dict[str, Any]]:
         """Get top N constraint violations."""
         tier_config = TIER_LIMITS.get(tier, TIER_LIMITS["free"])
 
-        records = None
+        records = self._load_user_records(user_id)
+
         if tier_config["max_days"] is not None:
             cutoff = datetime.now(timezone.utc) - timedelta(days=tier_config["max_days"])
             cutoff_str = cutoff.strftime("%Y-%m-%dT%H:%M:%SZ")
-            records = self._query.filter(after=cutoff_str)
+            records = [r for r in records if r.timestamp >= cutoff_str]
 
-        violations = self._query.top_violations(n=n, records=records)
-        return [{"constraint": name, "count": count} for name, count in violations]
+        violations: Dict[str, int] = {}
+        for r in records:
+            for attempt in r.reasoning.attempts:
+                for c in attempt.candidates:
+                    if c.policy_evaluation and c.policy_evaluation.violations:
+                        for v in c.policy_evaluation.violations:
+                            violations[v.constraint] = violations.get(v.constraint, 0) + 1
+
+        sorted_violations = sorted(violations.items(), key=lambda x: -x[1])[:n]
+        return [{"constraint": name, "count": count} for name, count in sorted_violations]
 
     # ========================================================================
     # AGENT STATS (Feature 3 — Multi-Agent)
     # ========================================================================
 
-    def get_agent_stats(self, tier: str = "free") -> List[Dict[str, Any]]:
+    def get_agent_stats(self, tier: str = "free", user_id: Optional[int] = None) -> List[Dict[str, Any]]:
         """Get per-agent statistics."""
         tier_config = TIER_LIMITS.get(tier, TIER_LIMITS["free"])
-        records = self._query.filter()
+        records = self._load_user_records(user_id)
 
         # Apply tier date limit
         if tier_config["max_days"] is not None:
@@ -187,17 +262,23 @@ class AuditService:
         tier: str = "free",
         last_days: Optional[int] = None,
         result: Optional[str] = None,
+        user_id: Optional[int] = None,
     ) -> Any:
         """Export audit records as JSON-serializable data."""
         tier_config = TIER_LIMITS.get(tier, TIER_LIMITS["free"])
 
-        effective_after = None
+        records = self._load_user_records(user_id)
+
+        # Apply date filter
         days = last_days or tier_config.get("max_days")
         if days is not None:
             cutoff = datetime.now(timezone.utc) - timedelta(days=days)
-            effective_after = cutoff.strftime("%Y-%m-%dT%H:%M:%SZ")
+            cutoff_str = cutoff.strftime("%Y-%m-%dT%H:%M:%SZ")
+            records = [r for r in records if r.timestamp >= cutoff_str]
 
-        records = self._query.filter(result=result, after=effective_after)
+        # Apply result filter
+        if result:
+            records = [r for r in records if r.decision.result == result]
 
         max_records = tier_config["max_records"]
         if max_records is not None:
@@ -206,8 +287,7 @@ class AuditService:
         if format == "compact":
             return [r.to_compact() for r in records]
         elif format == "stats":
-            stats = self._query.stats(last_days=days)
-            return stats.to_dict()
+            return self.get_stats(tier=tier, last_days=days, user_id=user_id)
         else:  # json
             return [r.to_dict() for r in records]
 
@@ -215,9 +295,13 @@ class AuditService:
     # EXPLANATION (Art. 86)
     # ========================================================================
 
-    def get_explanation_html(self, decision_id: str) -> str:
+    def get_explanation_html(self, decision_id: str, user_id: Optional[int] = None) -> str:
         """Generate Art. 86 HTML explanation for a single decision."""
-        record = load_record(decision_id, audit_dir=self._audit_dir)
+        if user_id is not None and self._storage is not None:
+            raw = self._storage.load(user_id, decision_id)
+            record = DecisionAuditRecord.from_dict(raw)
+        else:
+            record = load_record(decision_id, audit_dir=self._audit_dir)
         return generate_html(record)
 
     # ========================================================================

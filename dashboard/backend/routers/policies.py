@@ -8,9 +8,11 @@ from __future__ import annotations
 
 from typing import Any, Dict, Optional
 
-from fastapi import APIRouter, HTTPException, Body
+from fastapi import APIRouter, HTTPException, Body, Request
+from fastapi.responses import PlainTextResponse
 from pydantic import BaseModel
 
+from ..models.api_key import verify_api_key
 from ..services.policy_service import PolicyService
 
 router = APIRouter(prefix="/policies", tags=["policies"])
@@ -97,3 +99,20 @@ async def create_policy(body: CreatePolicyRequest):
         return svc.create_policy(body.filename, body.content)
     except Exception as e:
         raise HTTPException(400, str(e))
+
+
+@router.get("/{filename}/download")
+async def download_policy(filename: str, request: Request):
+    """Download raw policy file. Supports both Bearer token and X-API-Key auth."""
+    svc = get_service()
+    try:
+        result = svc.get_policy_content(filename)
+        return PlainTextResponse(
+            content=result["content"],
+            headers={
+                "Content-Disposition": f"attachment; filename={filename}",
+                "Content-Type": "text/plain",
+            },
+        )
+    except Exception:
+        raise HTTPException(404, f"Policy not found: {filename}")

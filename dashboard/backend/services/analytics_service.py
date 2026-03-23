@@ -1,8 +1,8 @@
 """
 Analytics Service — time-series aggregation over audit records.
 
-Builds trend data, heatmaps, and performance distributions
-from the existing DecisionAuditRecord data.
+Builds trend data, heatmaps, and performance distributions.
+Supports user-isolated mode via StorageBackend.
 """
 
 from __future__ import annotations
@@ -14,18 +14,31 @@ from typing import Any, Dict, List, Optional
 from chimera_runtime.audit.storage import load_all_records
 from chimera_runtime.models import DecisionAuditRecord
 
+from .storage_service import StorageBackend
+
 
 class AnalyticsService:
     """Aggregation engine for dashboard charts."""
 
-    def __init__(self, audit_dir: str = "./audit_logs"):
+    def __init__(self, audit_dir: str = "./audit_logs", storage: Optional[StorageBackend] = None):
         self._audit_dir = audit_dir
+        self._storage = storage
 
     def _load_records(
-        self, last_days: Optional[int] = None
+        self, last_days: Optional[int] = None, user_id: Optional[int] = None
     ) -> List[DecisionAuditRecord]:
-        """Load and optionally filter records by date."""
-        records = load_all_records(self._audit_dir)
+        """Load and optionally filter records by date, with user isolation."""
+        if user_id is not None and self._storage is not None:
+            raw_records = self._storage.list_records(user_id)
+            records = []
+            for raw in raw_records:
+                try:
+                    records.append(DecisionAuditRecord.from_dict(raw))
+                except Exception:
+                    continue
+        else:
+            records = load_all_records(self._audit_dir)
+
         if last_days is not None:
             cutoff = datetime.now(timezone.utc) - timedelta(days=last_days)
             cutoff_str = cutoff.strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -40,9 +53,10 @@ class AnalyticsService:
         self,
         granularity: str = "daily",
         last_days: int = 30,
+        user_id: Optional[int] = None,
     ) -> Dict[str, Any]:
         """Decision counts over time, grouped by result type."""
-        records = self._load_records(last_days=last_days)
+        records = self._load_records(last_days=last_days, user_id=user_id)
 
         buckets: Dict[str, Dict[str, int]] = defaultdict(
             lambda: {"ALLOWED": 0, "BLOCKED": 0, "HUMAN_OVERRIDE": 0, "INTERRUPTED": 0, "total": 0}
@@ -54,7 +68,6 @@ class AnalyticsService:
             buckets[key][result] = buckets[key].get(result, 0) + 1
             buckets[key]["total"] += 1
 
-        # Sort by date
         sorted_keys = sorted(buckets.keys())
         return {
             "granularity": granularity,
@@ -66,11 +79,10 @@ class AnalyticsService:
     # BLOCK RATE HEATMAP (hour x day-of-week)
     # ========================================================================
 
-    def get_heatmap(self, last_days: int = 30) -> Dict[str, Any]:
+    def get_heatmap(self, last_days: int = 30, user_id: Optional[int] = None) -> Dict[str, Any]:
         """Block rate by hour-of-day and day-of-week."""
-        records = self._load_records(last_days=last_days)
+        records = self._load_records(last_days=last_days, user_id=user_id)
 
-        # Matrix: [day_of_week][hour] -> {blocked, total}
         matrix: Dict[int, Dict[int, Dict[str, int]]] = defaultdict(
             lambda: defaultdict(lambda: {"blocked": 0, "total": 0})
         )
@@ -78,7 +90,7 @@ class AnalyticsService:
         for r in records:
             try:
                 dt = datetime.fromisoformat(r.timestamp.replace("Z", "+00:00"))
-                dow = dt.weekday()  # 0=Monday, 6=Sunday
+                dow = dt.weekday()
                 hour = dt.hour
                 matrix[dow][hour]["total"] += 1
                 if r.decision.result == "BLOCKED":
@@ -107,9 +119,9 @@ class AnalyticsService:
     # VIOLATION TREND
     # ========================================================================
 
-    def get_violation_trend(self, last_days: int = 30) -> Dict[str, Any]:
+    def get_violation_trend(self, last_days: int = 30, user_id: Optional[int] = None) -> Dict[str, Any]:
         """Violation frequency over time."""
-        records = self._load_records(last_days=last_days)
+        records = self._load_records(last_days=last_days, user_id=user_id)
 
         buckets: Dict[str, Counter] = defaultdict(Counter)
 
@@ -134,9 +146,9 @@ class AnalyticsService:
     # PERFORMANCE DISTRIBUTION
     # ========================================================================
 
-    def get_performance(self, last_days: int = 30) -> Dict[str, Any]:
+    def get_performance(self, last_days: int = 30, user_id: Optional[int] = None) -> Dict[str, Any]:
         """Latency distribution: total, llm, policy eval durations."""
-        records = self._load_records(last_days=last_days)
+        records = self._load_records(last_days=last_days, user_id=user_id)
 
         total_ms = []
         llm_ms = []
@@ -161,10 +173,6 @@ class AnalyticsService:
         }
 
     # ========================================================================
-    # HELPERS
-    # ========================================================================
-
-    # ========================================================================
     # LLM COST ESTIMATOR
     # ========================================================================
 
@@ -175,9 +183,9 @@ class AnalyticsService:
         "gemini-pro": 0.002, "gemini-1.5-pro": 0.003, "demo": 0.0,
     }
 
-    def get_cost_estimate(self, last_days: int = 30) -> Dict[str, Any]:
+    def get_cost_estimate(self, last_days: int = 30, user_id: Optional[int] = None) -> Dict[str, Any]:
         """Estimate LLM costs from audit records."""
-        records = self._load_records(last_days=last_days)
+        records = self._load_records(last_days=last_days, user_id=user_id)
         cost_by_model: Dict[str, float] = defaultdict(float)
         cost_by_day: Dict[str, Dict[str, Any]] = defaultdict(
             lambda: {"cost": 0.0, "decisions": 0}
@@ -211,6 +219,10 @@ class AnalyticsService:
             "total_decisions": n,
         }
 
+    # ========================================================================
+    # HELPERS
+    # ========================================================================
+
     @staticmethod
     def _bucket_key(timestamp: str, granularity: str) -> str:
         """Convert ISO timestamp to bucket key."""
@@ -222,10 +234,9 @@ class AnalyticsService:
         if granularity == "hourly":
             return dt.strftime("%Y-%m-%dT%H:00")
         elif granularity == "weekly":
-            # Start of week (Monday)
             start = dt - timedelta(days=dt.weekday())
             return start.strftime("%Y-%m-%d")
-        else:  # daily
+        else:
             return dt.strftime("%Y-%m-%d")
 
     @staticmethod

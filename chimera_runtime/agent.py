@@ -150,10 +150,37 @@ class ChimeraAgent:
         # Oversight
         self._oversight = oversight or HumanOversight(mode="auto")
 
+        # Cloud upload (Pro+ only)
+        self._uploader = None
+        self._init_uploader()
+
         # State
         self._halted = False
         self._consecutive_blocks = 0
         self._decision_count = 0
+
+    # ========================================================================
+    # CLOUD UPLOAD
+    # ========================================================================
+
+    def _init_uploader(self) -> None:
+        """Initialize cloud uploader if CHIMERA_DASHBOARD_API_KEY is set."""
+        import os
+        api_key = os.getenv("CHIMERA_DASHBOARD_API_KEY")
+        dashboard_url = os.getenv(
+            "CHIMERA_DASHBOARD_URL",
+            "https://api-runtime.chimera-protocol.com/api/v1",
+        )
+        if api_key:
+            try:
+                from .audit.uploader import AuditUploader
+                self._uploader = AuditUploader(
+                    api_key=api_key,
+                    dashboard_url=dashboard_url,
+                )
+                self._uploader.start()
+            except Exception:
+                pass  # Silently fail — don't break the agent
 
     # ========================================================================
     # FACTORY
@@ -584,6 +611,13 @@ class ChimeraAgent:
                 save_record(audit_record, audit_dir=self._audit_dir)
             except Exception:
                 pass  # Don't let audit I/O failures break the decide pipeline
+
+        # Upload to cloud dashboard (Pro+ only, non-blocking)
+        if self._uploader:
+            try:
+                self._uploader.enqueue(audit_record.to_dict())
+            except Exception:
+                pass  # Never break the pipeline for upload failures
 
         return result
 
