@@ -283,7 +283,7 @@ DOMAIN DAOTreasury {
 // - Remote node execution
 
 // See full source at:
-// github.com/chimera-ai-solutions/CSL-Core/blob/main/examples/openclaw_guard.csl
+// github.com/Chimera-Protocol/csl-core/blob/main/examples/openclaw_guard.csl
 
 CONFIG {
   ENFORCEMENT_MODE: BLOCK
@@ -845,7 +845,7 @@ export function PolicyMarketplace() {
           </p>
         </div>
         <a
-          href="https://github.com/chimera-ai-solutions/CSL-Core/tree/main/examples/community"
+          href="https://github.com/Chimera-Protocol/csl-core/tree/main/examples/community"
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -871,7 +871,7 @@ export function PolicyMarketplace() {
           <strong className="text-[#22c55e]">Want your policy listed here?</strong>{" "}
           Submit a PR to the{" "}
           <a
-            href="https://github.com/chimera-ai-solutions/CSL-Core/tree/main/examples/community"
+            href="https://github.com/Chimera-Protocol/csl-core/tree/main/examples/community"
             target="_blank"
             rel="noopener noreferrer"
             className="underline hover:text-[#22c55e] transition-colors"
