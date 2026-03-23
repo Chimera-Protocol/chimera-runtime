@@ -39,10 +39,11 @@ export default function RegisterPage() {
   };
 
   const features = [
+    "Full Pro access during open beta",
     "Real-time enforcement monitoring",
     "Z3 formal policy verification",
-    "EU AI Act audit trail",
-    "Unlimited local usage (pip install)",
+    "Cloud audit sync & analytics",
+    "EU AI Act compliance trail",
   ];
 
   return (
@@ -58,7 +59,7 @@ export default function RegisterPage() {
             <Shield className="w-8 h-8 text-[#6366f1]" />
             <span className="text-2xl font-bold text-white">Chimera.</span>
           </Link>
-          <p className="text-[#71717a] mt-2">Create your free account</p>
+          <p className="text-[#71717a] mt-2">Join the open beta — full Pro access</p>
         </div>
 
         {/* Register Card */}
@@ -134,7 +135,7 @@ export default function RegisterPage() {
 
           {/* Feature list */}
           <div className="mt-6 pt-6 border-t border-[#1e1e2e]">
-            <p className="text-xs text-[#71717a] mb-3 uppercase tracking-wide">Free tier includes</p>
+            <p className="text-xs text-[#71717a] mb-3 uppercase tracking-wide">Open beta includes</p>
             <div className="space-y-2">
               {features.map((f) => (
                 <div key={f} className="flex items-center gap-2 text-sm text-[#a1a1aa]">

@@ -30,7 +30,7 @@ def get_service() -> AuthService:
 class RegisterRequest(BaseModel):
     email: str
     password: str
-    tier: str = "free"
+    tier: str = "pro"  # Open beta: all new users get Pro
 
 
 class LoginRequest(BaseModel):
@@ -47,10 +47,11 @@ class ChangePasswordRequest(BaseModel):
 
 @router.post("/register")
 async def register(body: RegisterRequest):
-    """Register a new user account."""
+    """Register a new user account. Open beta: defaults to Pro tier."""
     svc = get_service()
     try:
-        result = svc.register(body.email, body.password, body.tier)
+        # Force pro tier during open beta regardless of what client sends
+        result = svc.register(body.email, body.password, "pro")
         return result
     except AuthError as e:
         raise HTTPException(status_code=e.status_code, detail=e.message)
