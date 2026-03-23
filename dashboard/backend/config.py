@@ -25,7 +25,7 @@ class DashboardConfig:
     access_token_expire_minutes: int = 60 * 24  # 24 hours
 
     # Database
-    database_url: str = "sqlite:///./dashboard/chimera_dashboard.db"
+    database_url: str = "sqlite:///./data/chimera_dashboard.db"
 
     # Storage backend ("local" or "s3")
     storage_backend: str = "local"
@@ -60,7 +60,7 @@ class DashboardConfig:
             ),
             database_url=os.getenv(
                 "CHIMERA_DATABASE_URL",
-                "sqlite:///./dashboard/chimera_dashboard.db",
+                "sqlite:///./data/chimera_dashboard.db",
             ),
             storage_backend=os.getenv("CHIMERA_STORAGE_BACKEND", "local"),
             s3_bucket=os.getenv("CHIMERA_S3_BUCKET", ""),

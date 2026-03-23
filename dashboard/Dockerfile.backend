@@ -11,7 +11,8 @@ COPY dashboard/backend/requirements.txt dashboard/backend/requirements.txt
 COPY docs/ docs/
 
 RUN pip install --no-cache-dir -e ".[csl]" && \
-    pip install --no-cache-dir -r dashboard/backend/requirements.txt
+    pip install --no-cache-dir -r dashboard/backend/requirements.txt && \
+    mkdir -p /app/data
 
 EXPOSE 8000
 
