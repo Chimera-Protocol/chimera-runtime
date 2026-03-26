@@ -27,29 +27,34 @@
 
 ---
 
-## The Problem
+## Why This Exists
 
-LLMs don't follow rules. They approximate them.
+A Meta AI agent went rogue last week. It exposed sensitive company and user data to unauthorized engineers for two hours. Sev 1. The agent had valid credentials the entire time — nothing in the identity stack could tell a legitimate request from a rogue one.
 
-They hallucinate. They get prompt-injected. They break constraints silently. And yet, we hand them real-world decisions -- financial approvals, infrastructure changes, customer-facing actions -- and hope for the best.
+This is not an isolated incident. An alignment researcher's OpenClaw agent mass-deleted her entire inbox, ignoring stop commands. 63% of organizations can't enforce limits on what their agents do. 60% can't terminate a misbehaving agent. Only 5% of CISOs feel confident they could contain a compromised AI agent.
 
-Hope is not a runtime strategy.
+The problem isn't the models. The problem is that **agents have no runtime constraints.**
 
-## The Solution
+Prompt-level instructions get dropped during context compaction. System prompts get bypassed through injection. "Please confirm before acting" is not a security control — it's a suggestion the model can ignore.
 
-Chimera is a **deterministic execution layer** that sits between your AI agent and the real world.
+## What Chimera Does
 
-Not a wrapper. Not a filter. Not another prompt engineering trick.
-
-A **runtime** that enforces constraints *outside* the model, verifies policies with **formal logic (Z3)**, and **blocks invalid actions before they happen**.
-
-Every decision is: **Checked. Proven. Enforced.**
+Chimera is a **deterministic enforcement layer** that sits between your AI agent and the real world. It doesn't ask the model to follow rules. It **prevents the model from breaking them.**
 
 ```
-Agent Intent → Constraint Guard → ALLOW / BLOCK / ASK_HUMAN → Audit Record
+Agent Action → Policy Guard → ALLOW / BLOCK / ASK_HUMAN → Audit Record
 ```
 
-No exceptions. No bypass. No "the model said it was fine."
+- **BLOCK** unauthorized actions before they execute — not after
+- **Enforce** spending limits, data access boundaries, API restrictions, approval workflows
+- **Prove** your policies are consistent and conflict-free with Z3 formal verification
+- **Audit** every decision automatically — who, what, when, why, and what was blocked
+
+Works with **LangChain, LangGraph, CrewAI, LlamaIndex, AutoGen, OpenAI, Anthropic, Google, Ollama** — or any custom agent. Setup takes 5 minutes with the built-in wizard.
+
+The model's opinion on whether it should be allowed to do something is **irrelevant**. Constraints live outside the model. Enforcement happens outside the model.
+
+**The model generates. Chimera governs.**
 
 ---
 
