@@ -58,6 +58,8 @@ The model's opinion on whether it should be allowed to do something is **irrelev
 
 ---
 
+> 🎬 **[60-second demo →](https://youtu.be/XcPzAVVc-C0)**
+
 ## Quickstart
 
 ```bash
